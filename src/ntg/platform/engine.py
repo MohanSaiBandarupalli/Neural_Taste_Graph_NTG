@@ -58,6 +58,19 @@ class Engine:
         self.titles_lower = d.items["display_title"].str.lower().to_numpy()
         self.genre_index = {g: k for k, g in enumerate(d.genre_vocab)}
         self.mean_rating, self.n_ratings = self._item_rating_stats()
+        # Precomputed per-item cards / genre lists: avoids pandas row access on the request path.
+        pop = self.cs.pop
+        pct = np.argsort(np.argsort(pop, kind="stable"), kind="stable") / max(len(pop) - 1, 1)
+        items = d.items
+        self._titles = items["display_title"].astype(str).tolist()
+        self._genres = [list(g) for g in items["genres"]]
+        self._cards = [{
+            "item_id": int(iid), "title": self._titles[k],
+            "year": int(y) if pd.notna(y) else None, "genres": self._genres[k], "tags": list(t)[:6],
+            "avg_rating": round(float(self.mean_rating[k]), 2) if self.n_ratings[k] else None,
+            "n_ratings": int(self.n_ratings[k]), "popularity_percentile": float(pct[k]),
+        } for k, (iid, y, t) in enumerate(zip(items["item_id"], items["year"], items["tags"]))]
+        self._S_csc = self.cs.models["itemknn"].S.tocsc() if "itemknn" in self.cs.models else None
 
     # ------------------------------------------------------------------ loading
     @classmethod
@@ -89,17 +102,7 @@ class Engine:
             raise UnknownItem(item_id) from e
 
     def item_card(self, i: int) -> dict:
-        r = self.data.items.iloc[int(i)]
-        return {
-            "item_id": int(r["item_id"]),
-            "title": str(r["display_title"]),
-            "year": int(r["year"]) if pd.notna(r["year"]) else None,
-            "genres": list(r["genres"]),
-            "tags": list(r["tags"])[:6],
-            "avg_rating": round(float(self.mean_rating[i]), 2) if self.n_ratings[i] else None,
-            "n_ratings": int(self.n_ratings[i]),
-            "popularity_percentile": float((self.cs.pop < self.cs.pop[i]).mean()),
-        }
+        return dict(self._cards[int(i)])
 
     def history(self, viewer: str, dataset_user_id: int | None) -> History:
         items, ratings, ts = [], [], []
@@ -429,17 +432,18 @@ def explain_for_history(eng: Engine, h: History, st: dict, i: int, provenance: i
     cs, d, tt = eng.cs, eng.data, eng.cs.tt
     reasons = []
     anchors = []
-    if "itemknn" in cs.models and h.items.size:
-        S = cs.models["itemknn"].S
-        hist = h.unique_items
-        col = np.asarray(S[hist, i].todense()).ravel()
-        for j in np.argsort(-col)[:3]:
-            if col[j] > 0:
-                anchors.append({"item_id": int(d.item_ids[hist[j]]), "title": d.item_title(int(hist[j])), "similarity": float(col[j])})
+    if eng._S_csc is not None and h.items.size:
+        S = eng._S_csc
+        rows, vals = S.indices[S.indptr[i]:S.indptr[i + 1]], S.data[S.indptr[i]:S.indptr[i + 1]]
+        hit = np.isin(rows, h.unique_items)
+        rows, vals = rows[hit], vals[hit]
+        for j in np.argsort(-vals)[:3]:
+            if vals[j] > 0:
+                anchors.append({"item_id": int(d.item_ids[rows[j]]), "title": eng._titles[int(rows[j])], "similarity": float(vals[j])})
     if anchors:
         reasons.append({"type": "because_you_watched", "text": "Because you watched " + " and ".join(a["title"] for a in anchors[:2]),
                         "evidence": anchors})
-    genres = list(d.items.at[i, "genres"])
+    genres = eng._genres[i]
     ls = dict(zip(tt.genres, tt._share(st["S_long"])))
     mom = dict(zip(tt.genres, tt._share(st["S_short"]) - tt._share(st["S_long"])))
     matched = sorted([(g, ls.get(g, 0.0)) for g in genres if ls.get(g, 0.0) > 0.08], key=lambda x: -x[1])

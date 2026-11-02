@@ -128,8 +128,10 @@ def make_session_factory(url: str):
                         pool_pre_ping=True)
     if url.startswith("sqlite"):
         @event.listens_for(eng, "connect")
-        def _fk(dbapi_conn, _):  # enforce ON DELETE CASCADE in SQLite
+        def _fk(dbapi_conn, _):  # enforce ON DELETE CASCADE; WAL avoids an fsync-bound commit per request
             dbapi_conn.execute("PRAGMA foreign_keys=ON")
+            dbapi_conn.execute("PRAGMA journal_mode=WAL")
+            dbapi_conn.execute("PRAGMA synchronous=NORMAL")
     return eng, sessionmaker(bind=eng, expire_on_commit=False)
 
 

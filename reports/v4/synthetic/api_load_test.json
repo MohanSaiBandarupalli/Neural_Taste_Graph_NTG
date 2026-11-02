@@ -1,0 +1,30 @@
+{
+ "endpoint": "POST /v1/profiles/{id}/recommendations (k=20, 50% with explanations)",
+ "server": "1 uvicorn worker, in-process engine",
+ "client": "httpx keep-alive pool",
+ "evidence_type": "observed",
+ "concurrency_1": {
+  "n": 200,
+  "rps": 62.1,
+  "p50_ms": 16.4,
+  "p95_ms": 20.8,
+  "p99_ms": 24.0,
+  "errors": 0
+ },
+ "concurrency_4": {
+  "n": 200,
+  "rps": 41.7,
+  "p50_ms": 98.7,
+  "p95_ms": 129.6,
+  "p99_ms": 135.7,
+  "errors": 0
+ },
+ "concurrency_8": {
+  "n": 200,
+  "rps": 37.5,
+  "p50_ms": 212.4,
+  "p95_ms": 279.3,
+  "p99_ms": 332.8,
+  "errors": 0
+ }
+}

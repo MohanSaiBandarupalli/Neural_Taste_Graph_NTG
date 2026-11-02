@@ -24,22 +24,22 @@
     },
     "policies": {
       "greedy_relevance": {
-        "n_users": 300,
-        "immediate_accept_rate": 0.9433333333333334,
-        "accepts_per_journey": 6.06,
+        "n_users": 600,
+        "immediate_accept_rate": 0.94,
+        "accepts_per_journey": 6.458333333333333,
         "accepts_ci95": [
-          5.5365,
-          6.617
+          6.049833333333334,
+          6.82675
         ],
-        "satisfaction_per_journey": 5.917426646202992,
+        "satisfaction_per_journey": 6.332870984910407,
         "satisfaction_ci95": [
-          5.425499736495823,
-          6.380909211410924
+          5.9956812466536205,
+          6.6811803885082455
         ],
-        "sessions_before_leaving": 11.48,
-        "genres_discovered": 1.0566666666666666,
-        "consecutive_same_genre_rate": 0.08567126337714573,
-        "slate_freshness": 0.2642688408293321,
+        "sessions_before_leaving": 12.075,
+        "genres_discovered": 1.085,
+        "consecutive_same_genre_rate": 0.08496710438254555,
+        "slate_freshness": 0.25569133709025654,
         "satisfaction_lift_vs_greedy": 0.0,
         "satisfaction_lift_vs_greedy_ci95": [
           0.0,
@@ -49,37 +49,37 @@
           0.0,
           0.0
         ],
-        "satisfaction_lift_vs_greedy_fresh": -4.352868026725044,
+        "satisfaction_lift_vs_greedy_fresh": -3.4887461340728425,
         "satisfaction_lift_vs_greedy_fresh_ci95": [
-          -5.102101381462978,
-          -3.5689743185024683
+          -4.091917969803839,
+          -2.929421718432815
         ]
       },
       "greedy_fresh": {
-        "n_users": 300,
-        "immediate_accept_rate": 0.9433333333333334,
-        "accepts_per_journey": 11.31,
+        "n_users": 600,
+        "immediate_accept_rate": 0.9566666666666667,
+        "accepts_per_journey": 10.655,
         "accepts_ci95": [
-          10.539,
-          12.037083333333332
+          10.134416666666667,
+          11.318333333333333
         ],
-        "satisfaction_per_journey": 10.270294672928037,
+        "satisfaction_per_journey": 9.82161711898325,
         "satisfaction_ci95": [
-          9.677850081412766,
-          10.888091043309919
+          9.359344148602172,
+          10.257705088325547
         ],
-        "sessions_before_leaving": 14.373333333333333,
-        "genres_discovered": 1.85,
-        "consecutive_same_genre_rate": 0.11661893030305667,
-        "slate_freshness": 0.5184304017103081,
-        "satisfaction_lift_vs_greedy": 4.352868026725044,
+        "sessions_before_leaving": 13.29,
+        "genres_discovered": 1.7616666666666667,
+        "consecutive_same_genre_rate": 0.10902621523468878,
+        "slate_freshness": 0.5420332474250024,
+        "satisfaction_lift_vs_greedy": 3.4887461340728425,
         "satisfaction_lift_vs_greedy_ci95": [
-          3.568974318502468,
-          5.102101381462978
+          2.929421718432815,
+          4.091917969803838
         ],
         "satisfaction_lift_ci95": [
-          3.568974318502468,
-          5.102101381462978
+          2.929421718432815,
+          4.091917969803838
         ],
         "satisfaction_lift_vs_greedy_fresh": 0.0,
         "satisfaction_lift_vs_greedy_fresh_ci95": [
@@ -88,131 +88,131 @@
         ]
       },
       "mmr_diversity": {
-        "n_users": 300,
-        "immediate_accept_rate": 0.9566666666666667,
-        "accepts_per_journey": 6.87,
+        "n_users": 600,
+        "immediate_accept_rate": 0.9416666666666667,
+        "accepts_per_journey": 7.155,
         "accepts_ci95": [
-          6.409833333333333,
-          7.400333333333333
+          6.8017916666666665,
+          7.574708333333333
         ],
-        "satisfaction_per_journey": 6.658375993996152,
+        "satisfaction_per_journey": 7.002705652130735,
         "satisfaction_ci95": [
-          6.16258109677296,
-          7.141322706703568
+          6.613485867716623,
+          7.302222913493826
         ],
-        "sessions_before_leaving": 12.003333333333334,
-        "genres_discovered": 1.5166666666666666,
-        "consecutive_same_genre_rate": 0.07685935714612185,
-        "slate_freshness": 0.2678929118928015,
-        "satisfaction_lift_vs_greedy": 0.7409493477931602,
+        "sessions_before_leaving": 12.385,
+        "genres_discovered": 1.5583333333333333,
+        "consecutive_same_genre_rate": 0.07959109894520111,
+        "slate_freshness": 0.2604284662636736,
+        "satisfaction_lift_vs_greedy": 0.6698346672203271,
         "satisfaction_lift_vs_greedy_ci95": [
-          0.12919130806846663,
-          1.3267311117258105
+          0.2052345471032051,
+          1.1281898961807235
         ],
         "satisfaction_lift_ci95": [
-          0.12919130806846663,
-          1.3267311117258105
+          0.2052345471032051,
+          1.1281898961807235
         ],
-        "satisfaction_lift_vs_greedy_fresh": -3.611918678931884,
+        "satisfaction_lift_vs_greedy_fresh": -2.8189114668525153,
         "satisfaction_lift_vs_greedy_fresh_ci95": [
-          -4.392494954588809,
-          -2.9012633368669936
+          -3.371116584403696,
+          -2.2210427053021835
         ]
       },
       "epsilon_greedy": {
-        "n_users": 300,
-        "immediate_accept_rate": 0.91,
-        "accepts_per_journey": 5.8966666666666665,
+        "n_users": 600,
+        "immediate_accept_rate": 0.8916666666666667,
+        "accepts_per_journey": 6.01,
         "accepts_ci95": [
-          5.456666666666667,
-          6.350333333333333
+          5.637458333333334,
+          6.396833333333333
         ],
-        "satisfaction_per_journey": 5.554924416286202,
+        "satisfaction_per_journey": 5.670476800897706,
         "satisfaction_ci95": [
-          5.115236735743461,
-          6.024488958636318
+          5.344890318154319,
+          6.041354364304332
         ],
-        "sessions_before_leaving": 11.536666666666667,
-        "genres_discovered": 1.0966666666666667,
-        "consecutive_same_genre_rate": 0.07867991077549902,
-        "slate_freshness": 0.4291971162479664,
-        "satisfaction_lift_vs_greedy": -0.3625022299167908,
+        "sessions_before_leaving": 11.511666666666667,
+        "genres_discovered": 1.0716666666666668,
+        "consecutive_same_genre_rate": 0.07240196649755473,
+        "slate_freshness": 0.43883663896160213,
+        "satisfaction_lift_vs_greedy": -0.6623941840127008,
         "satisfaction_lift_vs_greedy_ci95": [
-          -0.9067477619520862,
-          0.21854594587499013
+          -1.0388088710583383,
+          -0.24813395462613125
         ],
         "satisfaction_lift_ci95": [
-          -0.9067477619520862,
-          0.21854594587499013
+          -1.0388088710583383,
+          -0.24813395462613125
         ],
-        "satisfaction_lift_vs_greedy_fresh": -4.715370256641836,
+        "satisfaction_lift_vs_greedy_fresh": -4.1511403180855435,
         "satisfaction_lift_vs_greedy_fresh_ci95": [
-          -5.502814974454082,
-          -3.9421470914136445
+          -4.703521699301142,
+          -3.579504518613959
         ]
       },
       "genre_thompson": {
-        "n_users": 300,
-        "immediate_accept_rate": 0.9233333333333333,
-        "accepts_per_journey": 7.196666666666666,
+        "n_users": 600,
+        "immediate_accept_rate": 0.95,
+        "accepts_per_journey": 7.378333333333333,
         "accepts_ci95": [
-          6.601583333333333,
-          7.810499999999999
+          6.951083333333333,
+          7.845333333333333
         ],
-        "satisfaction_per_journey": 6.540018379609222,
+        "satisfaction_per_journey": 6.7568125585453345,
         "satisfaction_ci95": [
-          6.052196046371348,
-          6.943952314610513
+          6.438231973780648,
+          7.113309360230404
         ],
-        "sessions_before_leaving": 12.21,
-        "genres_discovered": 0.9433333333333334,
-        "consecutive_same_genre_rate": 0.08440437666908254,
-        "slate_freshness": 0.4373743489542171,
-        "satisfaction_lift_vs_greedy": 0.6225917334062299,
+        "sessions_before_leaving": 12.118333333333334,
+        "genres_discovered": 0.9316666666666666,
+        "consecutive_same_genre_rate": 0.08780598066937076,
+        "slate_freshness": 0.42423669407032644,
+        "satisfaction_lift_vs_greedy": 0.42394157363492757,
         "satisfaction_lift_vs_greedy_ci95": [
-          -0.036680000093855844,
-          1.2730595478145637
+          -0.024244682995119962,
+          0.8424771270134386
         ],
         "satisfaction_lift_ci95": [
-          -0.036680000093855844,
-          1.2730595478145637
+          -0.024244682995119962,
+          0.8424771270134386
         ],
-        "satisfaction_lift_vs_greedy_fresh": -3.7302762933188145,
+        "satisfaction_lift_vs_greedy_fresh": -3.064804560437915,
         "satisfaction_lift_vs_greedy_fresh_ci95": [
-          -4.533538210975991,
-          -2.9681402386944993
+          -3.643152975660524,
+          -2.5018585220144276
         ]
       },
       "journey_orchestrator": {
-        "n_users": 300,
-        "immediate_accept_rate": 0.9666666666666667,
-        "accepts_per_journey": 12.813333333333333,
+        "n_users": 600,
+        "immediate_accept_rate": 0.955,
+        "accepts_per_journey": 12.9,
         "accepts_ci95": [
-          12.062833333333334,
-          13.705916666666665
+          12.252375,
+          13.396625
         ],
-        "satisfaction_per_journey": 11.48096110904481,
+        "satisfaction_per_journey": 11.711588055041322,
         "satisfaction_ci95": [
-          10.857930062823536,
-          12.170120253647251
+          11.19599067640555,
+          12.303032212435818
         ],
-        "sessions_before_leaving": 15.536666666666667,
-        "genres_discovered": 2.59,
-        "consecutive_same_genre_rate": 0.040287829454288604,
-        "slate_freshness": 0.5206454289746637,
-        "satisfaction_lift_vs_greedy": 5.563534462841816,
+        "sessions_before_leaving": 15.385,
+        "genres_discovered": 2.5633333333333335,
+        "consecutive_same_genre_rate": 0.04396280911541209,
+        "slate_freshness": 0.5312857080968243,
+        "satisfaction_lift_vs_greedy": 5.378717070130914,
         "satisfaction_lift_vs_greedy_ci95": [
-          4.823889230862788,
-          6.299122156991277
+          4.874089303327688,
+          5.9133299153578855
         ],
         "satisfaction_lift_ci95": [
-          4.823889230862788,
-          6.299122156991277
+          4.874089303327688,
+          5.9133299153578855
         ],
-        "satisfaction_lift_vs_greedy_fresh": 1.2106664361167714,
+        "satisfaction_lift_vs_greedy_fresh": 1.8899709360580716,
         "satisfaction_lift_vs_greedy_fresh_ci95": [
-          0.3193020707504816,
-          2.109376712996319
+          1.1843639368559309,
+          2.5099510445184405
         ]
       }
     }
@@ -224,28 +224,28 @@
       {
         "fatigue_sensitivity": 0.0,
         "greedy_relevance": {
-          "satisfaction": 8.537181337029677,
-          "accepts": 8.966666666666667,
-          "sessions": 13.97,
+          "satisfaction": 8.848966413933306,
+          "accepts": 9.181666666666667,
+          "sessions": 14.09,
           "lift_vs_greedy": 0.0,
           "lift_ci95": [
             0.0,
             0.0
           ],
-          "lift_vs_greedy_fresh": -5.807684729561468,
+          "lift_vs_greedy_fresh": -5.629298158323961,
           "lift_vs_greedy_fresh_ci95": [
-            -6.640045475815063,
-            -4.981294493238477
+            -6.240676731513427,
+            -4.999258151946978
           ]
         },
         "greedy_fresh": {
-          "satisfaction": 14.344866066591145,
-          "accepts": 16.14,
-          "sessions": 18.246666666666666,
-          "lift_vs_greedy": 5.807684729561468,
+          "satisfaction": 14.478264572257267,
+          "accepts": 16.076666666666668,
+          "sessions": 17.988333333333333,
+          "lift_vs_greedy": 5.629298158323961,
           "lift_ci95": [
-            4.981294493238477,
-            6.640045475815062
+            4.999258151946978,
+            6.240676731513427
           ],
           "lift_vs_greedy_fresh": 0.0,
           "lift_vs_greedy_fresh_ci95": [
@@ -254,61 +254,61 @@
           ]
         },
         "mmr_diversity": {
-          "satisfaction": 8.651348565971666,
-          "accepts": 9.146666666666667,
-          "sessions": 14.22,
-          "lift_vs_greedy": 0.11416722894198929,
+          "satisfaction": 8.993586577684807,
+          "accepts": 9.385,
+          "sessions": 14.286666666666667,
+          "lift_vs_greedy": 0.14462016375150244,
           "lift_ci95": [
-            -0.7331345528202939,
-            0.8248217817278154
+            -0.4233832324382055,
+            0.7128956810346876
           ],
-          "lift_vs_greedy_fresh": -5.693517500619479,
+          "lift_vs_greedy_fresh": -5.484677994572459,
           "lift_vs_greedy_fresh_ci95": [
-            -6.640987865880514,
-            -4.885130278830993
+            -6.105003331954193,
+            -4.852819426336179
           ]
         },
         "journey_orchestrator": {
-          "satisfaction": 14.317699365286735,
-          "accepts": 16.096666666666668,
-          "sessions": 18.406666666666666,
-          "lift_vs_greedy": 5.78051802825706,
+          "satisfaction": 14.359722421776317,
+          "accepts": 15.968333333333334,
+          "sessions": 18.07,
+          "lift_vs_greedy": 5.510756007843012,
           "lift_ci95": [
-            4.991741850661185,
-            6.608956104389165
+            4.898619119239213,
+            6.087688162332588
           ],
-          "lift_vs_greedy_fresh": -0.02716670130441007,
+          "lift_vs_greedy_fresh": -0.11854215048094907,
           "lift_vs_greedy_fresh_ci95": [
-            -1.0289450976715022,
-            0.928373728169033
+            -0.8016165726035152,
+            0.6309670642830456
           ]
         }
       },
       {
         "fatigue_sensitivity": 0.5,
         "greedy_relevance": {
-          "satisfaction": 7.166945368627274,
-          "accepts": 7.423333333333333,
-          "sessions": 12.44,
+          "satisfaction": 7.43905518932141,
+          "accepts": 7.631666666666667,
+          "sessions": 12.53,
           "lift_vs_greedy": 0.0,
           "lift_ci95": [
             0.0,
             0.0
           ],
-          "lift_vs_greedy_fresh": -4.207558951787817,
+          "lift_vs_greedy_fresh": -4.581504186616198,
           "lift_vs_greedy_fresh_ci95": [
-            -5.084194717257766,
-            -3.250517080813823
+            -5.196835438145939,
+            -3.9154150404543064
           ]
         },
         "greedy_fresh": {
-          "satisfaction": 11.374504320415092,
-          "accepts": 12.656666666666666,
-          "sessions": 14.856666666666667,
-          "lift_vs_greedy": 4.207558951787817,
+          "satisfaction": 12.020559375937607,
+          "accepts": 13.223333333333333,
+          "sessions": 15.416666666666666,
+          "lift_vs_greedy": 4.581504186616198,
           "lift_ci95": [
-            3.250517080813822,
-            5.084194717257766
+            3.9154150404543064,
+            5.196835438145938
           ],
           "lift_vs_greedy_fresh": 0.0,
           "lift_vs_greedy_fresh_ci95": [
@@ -317,61 +317,61 @@
           ]
         },
         "mmr_diversity": {
-          "satisfaction": 7.504429842896247,
-          "accepts": 7.79,
-          "sessions": 12.813333333333333,
-          "lift_vs_greedy": 0.33748447426897327,
+          "satisfaction": 7.724151386544778,
+          "accepts": 7.965,
+          "sessions": 12.871666666666666,
+          "lift_vs_greedy": 0.28509619722336904,
           "lift_ci95": [
-            -0.4138145642463812,
-            1.0022378302122084
+            -0.21962567375795636,
+            0.7949322406050543
           ],
-          "lift_vs_greedy_fresh": -3.870074477518845,
+          "lift_vs_greedy_fresh": -4.296407989392829,
           "lift_vs_greedy_fresh_ci95": [
-            -4.880735641563674,
-            -2.985910393889914
+            -4.972616868595906,
+            -3.6270687616388346
           ]
         },
         "journey_orchestrator": {
-          "satisfaction": 12.380537523708595,
-          "accepts": 13.8,
-          "sessions": 16.286666666666665,
-          "lift_vs_greedy": 5.2135921550813205,
+          "satisfaction": 13.013283895983541,
+          "accepts": 14.421666666666667,
+          "sessions": 16.78,
+          "lift_vs_greedy": 5.574228706662131,
           "lift_ci95": [
-            4.337598027173136,
-            6.123726361090881
+            4.931830517527844,
+            6.238020445985323
           ],
-          "lift_vs_greedy_fresh": 1.0060332032935029,
+          "lift_vs_greedy_fresh": 0.9927245200459329,
           "lift_vs_greedy_fresh_ci95": [
-            0.059449817396262004,
-            1.9773394168328888
+            0.21640228997493466,
+            1.7461388586311621
           ]
         }
       },
       {
         "fatigue_sensitivity": 1.0,
         "greedy_relevance": {
-          "satisfaction": 5.917426646202992,
-          "accepts": 6.06,
-          "sessions": 11.48,
+          "satisfaction": 6.332870984910407,
+          "accepts": 6.458333333333333,
+          "sessions": 12.075,
           "lift_vs_greedy": 0.0,
           "lift_ci95": [
             0.0,
             0.0
           ],
-          "lift_vs_greedy_fresh": -4.352868026725044,
+          "lift_vs_greedy_fresh": -3.4887461340728425,
           "lift_vs_greedy_fresh_ci95": [
-            -5.102101381462978,
-            -3.5689743185024683
+            -4.091917969803839,
+            -2.929421718432815
           ]
         },
         "greedy_fresh": {
-          "satisfaction": 10.270294672928037,
-          "accepts": 11.31,
-          "sessions": 14.373333333333333,
-          "lift_vs_greedy": 4.352868026725044,
+          "satisfaction": 9.82161711898325,
+          "accepts": 10.655,
+          "sessions": 13.29,
+          "lift_vs_greedy": 3.4887461340728425,
           "lift_ci95": [
-            3.568974318502468,
-            5.102101381462978
+            2.929421718432815,
+            4.091917969803838
           ],
           "lift_vs_greedy_fresh": 0.0,
           "lift_vs_greedy_fresh_ci95": [
@@ -380,61 +380,61 @@
           ]
         },
         "mmr_diversity": {
-          "satisfaction": 6.658375993996152,
-          "accepts": 6.87,
-          "sessions": 12.003333333333334,
-          "lift_vs_greedy": 0.7409493477931602,
+          "satisfaction": 7.002705652130735,
+          "accepts": 7.155,
+          "sessions": 12.385,
+          "lift_vs_greedy": 0.6698346672203271,
           "lift_ci95": [
-            0.12919130806846663,
-            1.3267311117258105
+            0.2052345471032051,
+            1.1281898961807235
           ],
-          "lift_vs_greedy_fresh": -3.611918678931884,
+          "lift_vs_greedy_fresh": -2.8189114668525153,
           "lift_vs_greedy_fresh_ci95": [
-            -4.392494954588809,
-            -2.9012633368669936
+            -3.371116584403696,
+            -2.2210427053021835
           ]
         },
         "journey_orchestrator": {
-          "satisfaction": 11.48096110904481,
-          "accepts": 12.813333333333333,
-          "sessions": 15.536666666666667,
-          "lift_vs_greedy": 5.563534462841816,
+          "satisfaction": 11.711588055041322,
+          "accepts": 12.9,
+          "sessions": 15.385,
+          "lift_vs_greedy": 5.378717070130914,
           "lift_ci95": [
-            4.823889230862788,
-            6.299122156991277
+            4.874089303327688,
+            5.9133299153578855
           ],
-          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh": 1.8899709360580716,
           "lift_vs_greedy_fresh_ci95": [
-            0.3193020707504816,
-            2.109376712996319
+            1.1843639368559309,
+            2.5099510445184405
           ]
         }
       },
       {
         "fatigue_sensitivity": 1.5,
         "greedy_relevance": {
-          "satisfaction": 5.287314939907489,
-          "accepts": 5.323333333333333,
-          "sessions": 10.843333333333334,
+          "satisfaction": 5.5310763782050145,
+          "accepts": 5.55,
+          "sessions": 11.6,
           "lift_vs_greedy": 0.0,
           "lift_ci95": [
             0.0,
             0.0
           ],
-          "lift_vs_greedy_fresh": -4.138404167712938,
+          "lift_vs_greedy_fresh": -4.053818893519708,
           "lift_vs_greedy_fresh_ci95": [
-            -4.979226748768737,
-            -3.3220634358361116
+            -4.5861216828551585,
+            -3.503054027335194
           ]
         },
         "greedy_fresh": {
-          "satisfaction": 9.425719107620425,
-          "accepts": 10.316666666666666,
-          "sessions": 13.6,
-          "lift_vs_greedy": 4.138404167712938,
+          "satisfaction": 9.58489527172472,
+          "accepts": 10.378333333333334,
+          "sessions": 13.703333333333333,
+          "lift_vs_greedy": 4.053818893519708,
           "lift_ci95": [
-            3.322063435836111,
-            4.9792267487687365
+            3.503054027335194,
+            4.5861216828551585
           ],
           "lift_vs_greedy_fresh": 0.0,
           "lift_vs_greedy_fresh_ci95": [
@@ -443,33 +443,33 @@
           ]
         },
         "mmr_diversity": {
-          "satisfaction": 6.478857674249573,
-          "accepts": 6.6,
-          "sessions": 11.97,
-          "lift_vs_greedy": 1.1915427343420837,
+          "satisfaction": 6.400806175120347,
+          "accepts": 6.495,
+          "sessions": 11.715,
+          "lift_vs_greedy": 0.8697297969153326,
           "lift_ci95": [
-            0.5793698295370601,
-            1.8221527011082823
+            0.42422620289918705,
+            1.266277339550379
           ],
-          "lift_vs_greedy_fresh": -2.946861433370854,
+          "lift_vs_greedy_fresh": -3.184089096604374,
           "lift_vs_greedy_fresh_ci95": [
-            -3.7649604555660217,
-            -2.220749887143381
+            -3.7365051684240465,
+            -2.6368424658822867
           ]
         },
         "journey_orchestrator": {
-          "satisfaction": 11.251750639809451,
-          "accepts": 12.493333333333334,
-          "sessions": 15.42,
-          "lift_vs_greedy": 5.964435699901964,
+          "satisfaction": 11.195417344768147,
+          "accepts": 12.291666666666666,
+          "sessions": 15.013333333333334,
+          "lift_vs_greedy": 5.664340966563132,
           "lift_ci95": [
-            5.220812262213483,
-            6.701655509944019
+            5.120159509058536,
+            6.185543944765325
           ],
-          "lift_vs_greedy_fresh": 1.8260315321890266,
+          "lift_vs_greedy_fresh": 1.6105220730434258,
           "lift_vs_greedy_fresh_ci95": [
-            0.9881441180766655,
-            2.59088623964495
+            0.9550657379145191,
+            2.2550661676466914
           ]
         }
       }
@@ -482,28 +482,28 @@
       {
         "repeat_penalty": 1.0,
         "greedy_relevance": {
-          "satisfaction": 10.03944255616737,
-          "accepts": 10.72,
-          "sessions": 13.466666666666667,
+          "satisfaction": 10.362756958973621,
+          "accepts": 10.951666666666666,
+          "sessions": 13.781666666666666,
           "lift_vs_greedy": 0.0,
           "lift_ci95": [
             0.0,
             0.0
           ],
-          "lift_vs_greedy_fresh": -0.23085211676066758,
+          "lift_vs_greedy_fresh": 0.5411398399903719,
           "lift_vs_greedy_fresh_ci95": [
-            -1.159284162242303,
-            0.7949384192979356
+            -0.2069323404000549,
+            1.2968148125475691
           ]
         },
         "greedy_fresh": {
-          "satisfaction": 10.270294672928037,
-          "accepts": 11.31,
-          "sessions": 14.373333333333333,
-          "lift_vs_greedy": 0.23085211676066758,
+          "satisfaction": 9.82161711898325,
+          "accepts": 10.655,
+          "sessions": 13.29,
+          "lift_vs_greedy": -0.5411398399903719,
           "lift_ci95": [
-            -0.7949384192979357,
-            1.1592841622423027
+            -1.2968148125475694,
+            0.20693234040005376
           ],
           "lift_vs_greedy_fresh": 0.0,
           "lift_vs_greedy_fresh_ci95": [
@@ -512,61 +512,61 @@
           ]
         },
         "mmr_diversity": {
-          "satisfaction": 11.166501833575898,
-          "accepts": 12.03,
-          "sessions": 14.34,
-          "lift_vs_greedy": 1.1270592774085302,
+          "satisfaction": 12.079958269884168,
+          "accepts": 12.915,
+          "sessions": 15.208333333333334,
+          "lift_vs_greedy": 1.7172013109105475,
           "lift_ci95": [
-            0.31168550176385607,
-            1.9196991150516043
+            1.055431213197555,
+            2.3536623961598884
           ],
-          "lift_vs_greedy_fresh": 0.8962071606478627,
+          "lift_vs_greedy_fresh": 2.258341150900919,
           "lift_vs_greedy_fresh_ci95": [
-            -0.03381965562949972,
-            1.7850146194017038
+            1.6074516329545947,
+            2.9385266454204504
           ]
         },
         "journey_orchestrator": {
-          "satisfaction": 11.48096110904481,
-          "accepts": 12.813333333333333,
-          "sessions": 15.536666666666667,
-          "lift_vs_greedy": 1.4415185528774388,
+          "satisfaction": 11.711588055041322,
+          "accepts": 12.9,
+          "sessions": 15.385,
+          "lift_vs_greedy": 1.3488310960677,
           "lift_ci95": [
-            0.45436234708579504,
-            2.3430367888226677
+            0.6698103745133701,
+            2.009897482032237
           ],
-          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh": 1.8899709360580716,
           "lift_vs_greedy_fresh_ci95": [
-            0.3193020707504816,
-            2.109376712996319
+            1.1843639368559309,
+            2.5099510445184405
           ]
         }
       },
       {
         "repeat_penalty": 0.7,
         "greedy_relevance": {
-          "satisfaction": 8.396550638410796,
-          "accepts": 8.78,
-          "sessions": 12.683333333333334,
+          "satisfaction": 8.680886230261173,
+          "accepts": 9.013333333333334,
+          "sessions": 13.171666666666667,
           "lift_vs_greedy": 0.0,
           "lift_ci95": [
             0.0,
             0.0
           ],
-          "lift_vs_greedy_fresh": -1.87374403451724,
+          "lift_vs_greedy_fresh": -1.1407308887220768,
           "lift_vs_greedy_fresh_ci95": [
-            -2.7223510365229022,
-            -1.0724064493838705
+            -1.7425370869201784,
+            -0.5625362817264656
           ]
         },
         "greedy_fresh": {
-          "satisfaction": 10.270294672928037,
-          "accepts": 11.31,
-          "sessions": 14.373333333333333,
-          "lift_vs_greedy": 1.87374403451724,
+          "satisfaction": 9.82161711898325,
+          "accepts": 10.655,
+          "sessions": 13.29,
+          "lift_vs_greedy": 1.1407308887220768,
           "lift_ci95": [
-            1.07240644938387,
-            2.722351036522902
+            0.5625362817264655,
+            1.742537086920178
           ],
           "lift_vs_greedy_fresh": 0.0,
           "lift_vs_greedy_fresh_ci95": [
@@ -575,61 +575,61 @@
           ]
         },
         "mmr_diversity": {
-          "satisfaction": 9.768375846982787,
-          "accepts": 10.38,
-          "sessions": 14.2,
-          "lift_vs_greedy": 1.3718252085719906,
+          "satisfaction": 10.119948584199362,
+          "accepts": 10.641666666666667,
+          "sessions": 14.29,
+          "lift_vs_greedy": 1.439062353938189,
           "lift_ci95": [
-            0.5025277333958562,
-            2.3214016440493155
+            0.8581891906313581,
+            2.061348224401549
           ],
-          "lift_vs_greedy_fresh": -0.5019188259452492,
+          "lift_vs_greedy_fresh": 0.2983314652161125,
           "lift_vs_greedy_fresh_ci95": [
-            -1.4756575887590777,
-            0.34527381195276996
+            -0.38717656988892035,
+            0.9264110199524663
           ]
         },
         "journey_orchestrator": {
-          "satisfaction": 11.48096110904481,
-          "accepts": 12.813333333333333,
-          "sessions": 15.536666666666667,
-          "lift_vs_greedy": 3.0844104706340114,
+          "satisfaction": 11.711588055041322,
+          "accepts": 12.9,
+          "sessions": 15.385,
+          "lift_vs_greedy": 3.0307018247801483,
           "lift_ci95": [
-            2.238855786650949,
-            3.9093910310719395
+            2.4262252516843144,
+            3.6843987660486546
           ],
-          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh": 1.8899709360580716,
           "lift_vs_greedy_fresh_ci95": [
-            0.3193020707504816,
-            2.109376712996319
+            1.1843639368559309,
+            2.5099510445184405
           ]
         }
       },
       {
         "repeat_penalty": 0.4,
         "greedy_relevance": {
-          "satisfaction": 5.917426646202992,
-          "accepts": 6.06,
-          "sessions": 11.48,
+          "satisfaction": 6.332870984910407,
+          "accepts": 6.458333333333333,
+          "sessions": 12.075,
           "lift_vs_greedy": 0.0,
           "lift_ci95": [
             0.0,
             0.0
           ],
-          "lift_vs_greedy_fresh": -4.352868026725044,
+          "lift_vs_greedy_fresh": -3.4887461340728425,
           "lift_vs_greedy_fresh_ci95": [
-            -5.102101381462978,
-            -3.5689743185024683
+            -4.091917969803839,
+            -2.929421718432815
           ]
         },
         "greedy_fresh": {
-          "satisfaction": 10.270294672928037,
-          "accepts": 11.31,
-          "sessions": 14.373333333333333,
-          "lift_vs_greedy": 4.352868026725044,
+          "satisfaction": 9.82161711898325,
+          "accepts": 10.655,
+          "sessions": 13.29,
+          "lift_vs_greedy": 3.4887461340728425,
           "lift_ci95": [
-            3.568974318502468,
-            5.102101381462978
+            2.929421718432815,
+            4.091917969803838
           ],
           "lift_vs_greedy_fresh": 0.0,
           "lift_vs_greedy_fresh_ci95": [
@@ -638,33 +638,33 @@
           ]
         },
         "mmr_diversity": {
-          "satisfaction": 6.658375993996152,
-          "accepts": 6.87,
-          "sessions": 12.003333333333334,
-          "lift_vs_greedy": 0.7409493477931602,
+          "satisfaction": 7.002705652130735,
+          "accepts": 7.155,
+          "sessions": 12.385,
+          "lift_vs_greedy": 0.6698346672203271,
           "lift_ci95": [
-            0.12919130806846663,
-            1.3267311117258105
+            0.2052345471032051,
+            1.1281898961807235
           ],
-          "lift_vs_greedy_fresh": -3.611918678931884,
+          "lift_vs_greedy_fresh": -2.8189114668525153,
           "lift_vs_greedy_fresh_ci95": [
-            -4.392494954588809,
-            -2.9012633368669936
+            -3.371116584403696,
+            -2.2210427053021835
           ]
         },
         "journey_orchestrator": {
-          "satisfaction": 11.48096110904481,
-          "accepts": 12.813333333333333,
-          "sessions": 15.536666666666667,
-          "lift_vs_greedy": 5.563534462841816,
+          "satisfaction": 11.711588055041322,
+          "accepts": 12.9,
+          "sessions": 15.385,
+          "lift_vs_greedy": 5.378717070130914,
           "lift_ci95": [
-            4.823889230862788,
-            6.299122156991277
+            4.874089303327688,
+            5.9133299153578855
           ],
-          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh": 1.8899709360580716,
           "lift_vs_greedy_fresh_ci95": [
-            0.3193020707504816,
-            2.109376712996319
+            1.1843639368559309,
+            2.5099510445184405
           ]
         }
       }
@@ -675,17 +675,17 @@
     "protocol": "logging = \u03b5-greedy over top-20 (known propensities); target = greedy top-1; first session, single slot",
     "epsilon": 0.3,
     "n_logged": 20000,
-    "true_target_value": 0.5939085033578556,
-    "ips_estimate": 0.5972727272727274,
+    "true_target_value": 0.594854111505004,
+    "ips_estimate": 0.5976223776223777,
     "ips_ci95": [
-      0.5879650349650349,
-      0.6065839160839162
+      0.588520979020979,
+      0.6070664335664336
     ],
-    "snips_estimate": 0.591563928521956,
+    "snips_estimate": 0.5919102368749134,
     "snips_ci95": [
-      0.5832022491679452,
-      0.5991706923176569
+      0.5837660256306025,
+      0.6003661577457176
     ],
-    "naive_logged_average": 0.56975
+    "naive_logged_average": 0.57355
   }
 }

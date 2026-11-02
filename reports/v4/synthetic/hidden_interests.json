@@ -3,8 +3,8 @@
     "protocol": "users with >=3 holdout and >=5 fit events who newly adopt a genre (own share <5% before, >=15% after)",
     "n_users_evaluated": 1068,
     "n_users_adopting_new_genre": 211,
-    "hit_rate@3": 0.6066350710900474,
-    "precision@3": 0.22116903633491306,
+    "hit_rate@3": 0.5971563981042654,
+    "precision@3": 0.21800947867298578,
     "baseline_global_popular_hit_rate@3": 0.6161137440758294,
     "baseline_global_popular_precision@3": 0.21642969984202207
   },
@@ -12,8 +12,8 @@
     "protocol": "users with >=3 holdout and >=5 fit events who newly adopt a genre (own share <5% before, >=15% after)",
     "n_users_evaluated": 1101,
     "n_users_adopting_new_genre": 203,
-    "hit_rate@3": 0.5960591133004927,
-    "precision@3": 0.20525451559934318,
+    "hit_rate@3": 0.5862068965517241,
+    "precision@3": 0.2036124794745484,
     "baseline_global_popular_hit_rate@3": 0.6403940886699507,
     "baseline_global_popular_precision@3": 0.22660098522167485
   },
