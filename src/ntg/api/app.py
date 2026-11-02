@@ -4,7 +4,7 @@ Route groups
 ------------
 public      /health, /v1/auth/*
 viewer      /v1/me*, /v1/profiles/*            (JWT; a viewer can only touch their own profiles)
-catalog     /v1/catalog/*                       (JWT or API key)
+catalog     /v1/catalog/*                       (public: non-personal catalogue metadata)
 b2b         /v1/b2b/*                           (X-API-Key; org-scoped)
 enterprise  /v1/enterprise/*                    (JWT, role analyst|admin)
 admin       /v1/admin/*                         (JWT, role admin)

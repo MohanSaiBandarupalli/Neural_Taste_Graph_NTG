@@ -28,7 +28,9 @@ export function VBars({ data, x, series, height = 260, fmt, names }: { data: any
     <ResponsiveContainer width="100%" height={height}>
       <BarChart data={data} margin={{ left: 0, right: 8, top: 8, bottom: 4 }} barGap={2}>
         <CartesianGrid vertical={false} stroke="#262626" />
-        <XAxis dataKey={x} {...axis} interval={0} />
+        {data.length > 5
+          ? <XAxis dataKey={x} {...axis} interval={0} angle={-30} textAnchor="end" height={72} tick={{ fill: "#8b8a83", fontSize: 11 }} />
+          : <XAxis dataKey={x} {...axis} interval={0} />}
         <YAxis {...axis} tickFormatter={fmt} width={48} />
         <Tooltip {...tip} formatter={(v: any, n: any) => [fmt ? fmt(Number(v)) : v, names?.[n] ?? n]} />
         {series.length > 1 && <Legend wrapperStyle={{ fontSize: 12, color: "#c3c2b7" }} formatter={(n) => names?.[n] ?? n} />}
