@@ -99,7 +99,7 @@ class ItemKNN(Recommender):
     """Item-item cosine CF with shrinkage (generalises the legacy co-occurrence graph)."""
 
     name: str = "itemknn"
-    k: int = 100
+    k: int = 20
     shrink: float = 10.0
 
     def _fit(self, data, fit_df):
@@ -119,7 +119,7 @@ class EASE(Recommender):
     """Embarrassingly Shallow Autoencoder (Steck, 2019): closed-form item-item model."""
 
     name: str = "ease"
-    l2: float = 300.0
+    l2: float = 1500.0
     max_items: int = 25_000
 
     def _fit(self, data, fit_df):
@@ -141,8 +141,8 @@ class RP3Beta(Recommender):
     """Graph random walk user->item->user->item with popularity penalisation (Paudel et al.)."""
 
     name: str = "rp3beta"
-    alpha: float = 1.0
-    beta: float = 0.5
+    alpha: float = 0.8
+    beta: float = 0.6
     k: int = 100
 
     def _fit(self, data, fit_df):
@@ -169,10 +169,10 @@ class IALS(Recommender):
     """Implicit ALS (Hu, Koren & Volinsky 2008) with confidence c = 1 + alpha * x."""
 
     name: str = "ials"
-    factors: int = 64
-    reg: float = 0.1
-    alpha: float = 10.0
-    iterations: int = 12
+    factors: int = 16
+    reg: float = 1.0
+    alpha: float = 5.0
+    iterations: int = 8
     seed: int = 0
 
     def _solve(self, Y: np.ndarray, M: sp.csr_matrix) -> np.ndarray:
