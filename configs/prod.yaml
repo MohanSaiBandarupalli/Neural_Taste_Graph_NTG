@@ -1,4 +1,3 @@
-cat > configs/prod.yaml << 'YAML'
 # Production overrides (example)
 duckdb:
   threads: 8
@@ -7,4 +6,3 @@ duckdb:
 graph:
   topk_per_item: 200
   min_item_support: 500
-YAML

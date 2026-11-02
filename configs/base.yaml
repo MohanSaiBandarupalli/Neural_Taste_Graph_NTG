@@ -1,4 +1,3 @@
-cat > configs/base.yaml << 'YAML'
 project:
   name: "netflix-neural-taste-graph"
   seed: 42
@@ -31,4 +30,3 @@ duckdb:
   threads: 4
   memory_limit: "8GB"
   temp_dir: "data/interim/duckdb_tmp"
-YAML

@@ -208,13 +208,25 @@ def _train_eval_model(
     )
 
     model = Pipeline([("pre", pre), ("clf", clf)])
-    model.fit(X_train, y_train)
+    validation_note = "deterministic 80/20 split by user_id"
+    if y_train.nunique() < 2:
+        # Too little data for a held-out fold with both classes (e.g. tiny test
+        # fixtures). Fit on everything and report validation metrics as NaN
+        # instead of silently inventing numbers.
+        model.fit(X, y)
+        X_val, y_val = X.iloc[0:0], y.iloc[0:0]
+        validation_note = "insufficient data for held-out validation; metrics not computed"
+    else:
+        model.fit(X_train, y_train)
 
-    p_val = model.predict_proba(X_val)[:, 1]
-
-    roc = float(roc_auc_score(y_val, p_val)) if y_val.nunique() > 1 else float("nan")
-    prec, rec, _ = precision_recall_curve(y_val, p_val)
-    pr_auc = float(auc(rec, prec)) if len(rec) > 1 else float("nan")
+    if len(X_val) and y_val.nunique() > 1:
+        p_val = model.predict_proba(X_val)[:, 1]
+        roc = float(roc_auc_score(y_val, p_val))
+        prec, rec, _ = precision_recall_curve(y_val, p_val)
+        pr_auc = float(auc(rec, prec))
+    else:
+        roc = float("nan")
+        pr_auc = float("nan")
 
     report = {
         "n_users": int(len(X)),
@@ -227,7 +239,12 @@ def _train_eval_model(
             "days": cfg.inactivity_days,
             "fallback_frac": cfg.fallback_churn_frac,
         },
-        "leakage_safe": True,
+        "validation": validation_note,
+        # NOTE: legacy v1 model. Labels (inactivity at end of TRAIN) are derived
+        # from the same window as the features, so recency features leak the
+        # label. Use ntg.enterprise.engagement_risk for forward-looking labels.
+        "leakage_safe": False,
+        "superseded_by": "ntg.enterprise.engagement_risk",
     }
     return model, report
 
