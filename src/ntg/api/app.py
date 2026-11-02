@@ -17,7 +17,7 @@ import time
 import uuid
 from collections import deque
 from contextlib import asynccontextmanager
-from dataclasses import asdict, fields
+from dataclasses import asdict
 from datetime import date
 from pathlib import Path
 
@@ -31,8 +31,7 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ntg.api import db as m
-from ntg.api.security import (RateLimiter, decode_token, hash_api_key, hash_password, issue_token, new_api_key,
-                              verify_password)
+from ntg.api.security import RateLimiter, decode_token, hash_api_key, hash_password, issue_token, new_api_key, verify_password
 from ntg.core.config import Settings, get_settings
 from ntg.core.logging import get_logger
 from ntg.enterprise.analyst import BusinessAnalyst
@@ -228,7 +227,7 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         try:
             claims = decode_token(secret, auth[7:])
         except Exception:
-            raise HTTPException(401, "invalid or expired token")
+            raise HTTPException(401, "invalid or expired token") from None
         u = s.get(m.User, int(claims["sub"]))
         if u is None or u.org_id != claims.get("org"):
             raise HTTPException(401, "unknown user")
@@ -446,7 +445,7 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         try:
             e.item_index(body.item_id)
         except UnknownItem:
-            raise HTTPException(404, "unknown item")
+            raise HTTPException(404, "unknown item") from None
         rating = body.rating if body.rating is not None else {"watched": 3.5, "rated": 3.5, "like": 4.5, "dislike": 1.5, "not_interested": None}[body.kind]
         ev = m.Event(org_id=u.org_id, profile_id=p.id, item_id=body.item_id, kind=body.kind, rating=rating,
                      ts=max(e.now_ts, int(time.time())))
@@ -473,7 +472,7 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         try:
             return e.similar(item_id, k=12)
         except UnknownItem:
-            raise HTTPException(404, "unknown item")
+            raise HTTPException(404, "unknown item") from None
 
     # ------------------------------------------------------------------ B2B
     @app.post("/v1/b2b/recommend")
@@ -577,7 +576,7 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         recent = [x for x in latencies if now - x[3] < 3600]
         lat = [x[2] for x in recent]
         by_route: dict[str, list] = {}
-        for p_, st, ms, _ in recent:
+        for p_, _status, ms, _ in recent:
             by_route.setdefault(p_.split("/")[2] if p_.count("/") >= 2 else p_, []).append(ms)
         created = pd.Timestamp(e.manifest["created_at"])
         return {
@@ -606,7 +605,7 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         try:
             df = pd.read_csv(io.BytesIO(raw), nrows=1_000_000)
         except Exception:
-            raise HTTPException(422, "could not parse CSV")
+            raise HTTPException(422, "could not parse CSV") from None
         return _validate_interactions(df)
 
     @app.get("/v1/enterprise/experiments")
@@ -825,7 +824,6 @@ def _seed_demo(s: Session, e: Engine) -> None:
 def _aggregates(e: Engine) -> dict:
     """Population-level aggregates computed once at startup (pseudonymous, sampled)."""
     from ntg.discovery.features import user_state_features
-    from ntg.enterprise.engagement_risk import FEATURES as RISK_FEATURES
 
     out: dict = {}
     tt = e.cs.tt

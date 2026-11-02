@@ -1,0 +1,26 @@
+name: Model evaluation
+
+# Manual: full v4 pipeline (prepare -> tune -> train -> evaluate -> package) on synthetic data,
+# uploading every evaluation report. For real MovieLens, run locally (dataset licence: no redistribution).
+on:
+  workflow_dispatch:
+    inputs:
+      quick: { description: "Use quick grids", type: boolean, default: false }
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.11" }
+      - run: pip install "poetry==2.0.0" && poetry install --no-interaction --no-ansi
+      - name: Build + evaluate
+        run: poetry run python -m ntg.cli build --dataset synthetic ${{ inputs.quick && '--quick' || '' }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ntg-v4-reports
+          path: |
+            reports/v4/**
+            artifacts/**/manifest.json

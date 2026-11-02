@@ -3,6 +3,7 @@ const API = process.env.NTG_API_URL || "http://127.0.0.1:8000";
 const nextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
+  output: "standalone",
   async rewrites() {
     return [{ source: "/api/:path*", destination: `${API}/:path*` }];
   },

@@ -144,7 +144,7 @@ def generate(out_dir: str | Path, cfg: SyntheticConfig = SyntheticConfig()) -> d
     franchise_of = np.full(cfg.n_items, -1)
     n_seq = int(cfg.franchise_frac * cfg.n_items)
     seq_ids = rng.choice(np.arange(cfg.n_items // 2, cfg.n_items), size=n_seq, replace=False)
-    for k, s in enumerate(seq_ids):
+    for s in seq_ids:
         parent = int(rng.integers(0, cfg.n_items // 2))
         root = parent if franchise_of[parent] < 0 else franchise_of[parent]
         franchise_of[s] = root

@@ -109,7 +109,7 @@ def simulate(world: JourneyWorld, policy_factory, cfg: WorldConfig = WorldConfig
             sat = mem / max(mem.sum(), 1e-9) if mem.sum() > 0 else np.zeros(n_g)
             accepted = None
             exam = 1.0
-            for pos, j in enumerate(slate):
+            for j in slate:
                 if consumed[j]:
                     continue
                 g = world.primary[row, j]

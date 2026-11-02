@@ -1,31 +1,15 @@
-# python
-__pycache__/
-*.pyc
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-.coverage
-htmlcov/
-
-# env/ide
-.venv/
-venv/
-.env
-.vscode/
-.DS_Store
-
-# git
-.git/
-
-# project heavy artifacts (never bake)
+.git
+.venv
+**/__pycache__
+**/*.pyc
 data/
+artifacts/
 outputs/
-reports/
-notebooks/
-
-# temp
-data/interim/duckdb_tmp/
-*.csv
-*.zip
-*.tar
-*.gz
+frontend/node_modules
+frontend/.next
+docs/screenshots
+*.db
+*.db-wal
+*.db-shm
+.env
+.env.*

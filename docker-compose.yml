@@ -1,14 +1,43 @@
+# Local stack:  docker compose run --rm build-models   (once: synthetic data -> models -> reports)
+#               docker compose up -d api web          (http://localhost:3000)
+# Postgres:     NTG_DATABASE_URL=postgresql+psycopg://ntg:ntg@postgres:5432/ntg docker compose --profile postgres up -d
+x-api-env: &api-env
+  NTG_ENV: ${NTG_ENV:-development}
+  NTG_SECRET_KEY: ${NTG_SECRET_KEY:-}
+  NTG_DATASET: ${NTG_DATASET:-synthetic}
+  NTG_DATABASE_URL: ${NTG_DATABASE_URL:-sqlite:////app/data/v4/ntg_app.db}
+  NTG_CORS_ORIGINS: http://localhost:3000
+
 services:
-  ntg:
-    image: ntg:project_67
+  build-models:
+    build: .
+    image: ntg-api:4
+    command: ["python", "-m", "ntg.cli", "build", "--dataset", "${NTG_DATASET:-synthetic}"]
+    volumes: [ "./data:/app/data", "./artifacts:/app/artifacts", "./reports:/app/reports" ]
+    profiles: ["build"]
+
+  api:
+    build: .
+    image: ntg-api:4
+    environment: *api-env
+    volumes: [ "./data:/app/data", "./artifacts:/app/artifacts:ro", "./reports:/app/reports:ro" ]
+    ports: [ "8000:8000" ]
+    restart: unless-stopped
+
+  web:
     build:
-      context: .
-      dockerfile: Dockerfile
-    working_dir: /app
-    volumes:
-      - ./data:/app/data
-      - ./outputs:/app/outputs
-      - ./reports:/app/reports
-      - ./configs:/app/configs:ro
-    environment:
-      - PYTHONUNBUFFERED=1
+      context: ./frontend
+      args: { NTG_API_URL: "http://api:8000" }   # baked into the Next.js rewrite at build time
+    image: ntg-web:4
+    ports: [ "3000:3000" ]
+    depends_on: [ api ]
+    restart: unless-stopped
+
+  postgres:
+    image: postgres:16-alpine
+    environment: { POSTGRES_USER: ntg, POSTGRES_PASSWORD: ntg, POSTGRES_DB: ntg }
+    volumes: [ "pgdata:/var/lib/postgresql/data" ]
+    profiles: ["postgres"]
+
+volumes:
+  pgdata: {}

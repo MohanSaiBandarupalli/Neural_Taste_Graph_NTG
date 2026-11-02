@@ -19,13 +19,12 @@ import pickle
 import re
 import threading
 import time
-from dataclasses import replace
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
 
-from ntg.discovery.features import FATIGUE_FEATURES, user_state_features
+from ntg.discovery.features import user_state_features
 from ntg.intent.parser import ParsedIntent, parse_intent
 from ntg.journey.policies import JourneyOrchestrator, OrchestratorConfig
 from ntg.recsys.explain import GROUNDING, channel_names, ranker_drivers

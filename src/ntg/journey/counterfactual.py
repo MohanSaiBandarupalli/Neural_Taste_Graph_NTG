@@ -35,7 +35,7 @@ def compare_policies(world: JourneyWorld, cfg: WorldConfig = WorldConfig(), poli
         base = out.get(ref)
         if base is None:
             continue
-        for name, r in out.items():
+        for r in out.values():
             diff = r["_per_user_satisfaction"] - base["_per_user_satisfaction"]  # paired: same users, same seed
             rng = np.random.default_rng(1)
             boot = diff[rng.integers(0, len(diff), (500, len(diff)))].mean(1)

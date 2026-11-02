@@ -45,8 +45,8 @@ def test_viewer_flow_and_isolation(client):
     assert client.post(f"/v1/profiles/{pid}/recommendations", headers=H, json={"level": "bogus"}).status_code == 422
     # another user's profile is invisible
     other = client.post("/v1/auth/signup", json={"email": "iso@x.io", "password": "isolation-pass"}).json()
-    O = {"Authorization": f"Bearer {other['token']}"}
-    assert client.get(f"/v1/profiles/{pid}/tastetwin", headers=O).status_code == 404
+    other_h = {"Authorization": f"Bearer {other['token']}"}
+    assert client.get(f"/v1/profiles/{pid}/tastetwin", headers=other_h).status_code == 404
     # viewers cannot reach enterprise or admin routes
     assert client.get("/v1/enterprise/overview", headers=H).status_code == 403
     assert client.get("/v1/admin/users", headers=H).status_code == 403
@@ -118,5 +118,7 @@ def test_security_primitives():
     assert verify_password("correct horse battery", h) and not verify_password("wrong", h)
     t = issue_token("s" * 32, 1, 1, "viewer", 5)
     assert decode_token("s" * 32, t)["role"] == "viewer"
-    with pytest.raises(Exception):
+    import jwt
+
+    with pytest.raises(jwt.InvalidSignatureError):
         decode_token("other-secret-xxxxxxxxxxxxxxxxxxxxx", t)

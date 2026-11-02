@@ -102,7 +102,7 @@ def evaluate_hidden_interests(cs, holdout, min_new_share: float = 0.15, max_own:
     # baseline: the 3 globally most popular genres the user has < max_own share of
     base_hits, base_prec = [], []
     order = np.argsort(-tt.global_share)
-    for n, u_row in enumerate(np.flatnonzero(has)):
+    for u_row in np.flatnonzero(has):
         cand = [g for g in order if own[u_row, g] < max_own][:3]
         base_hits.append(any(adopted[u_row, g] for g in cand))
         base_prec.append(np.mean([adopted[u_row, g] for g in cand]) if cand else 0.0)

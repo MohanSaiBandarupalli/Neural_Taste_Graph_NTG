@@ -1,13 +1,12 @@
 from __future__ import annotations
 
 import numpy as np
-import pandas as pd
 import pytest
+import scipy.sparse as sp
 
 from ntg.datasets.prepare import franchise_key
 from ntg.recsys.evaluate import EvalConfig, _per_user_metrics, evaluate_recommender
 from ntg.recsys.models import MODEL_REGISTRY, History
-import scipy.sparse as sp
 
 
 def test_global_temporal_split_has_no_leakage(data):
