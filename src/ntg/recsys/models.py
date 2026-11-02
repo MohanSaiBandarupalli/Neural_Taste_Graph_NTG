@@ -48,6 +48,31 @@ def _sparse_topk_cols(m: sp.csr_matrix | np.ndarray, k: int) -> sp.csr_matrix:
 
 
 @dataclass
+class History:
+    """A single viewer's history: item indices, ratings and timestamps (any order)."""
+
+    items: np.ndarray
+    ratings: np.ndarray
+    ts: np.ndarray
+    now: int
+    n_items: int
+
+    def __post_init__(self):
+        order = np.argsort(self.ts, kind="stable")
+        self.items = np.asarray(self.items, dtype=np.int64)[order]
+        self.ratings = np.asarray(self.ratings, dtype=np.float64)[order]
+        self.ts = np.asarray(self.ts, dtype=np.int64)[order]
+
+    @property
+    def unique_items(self) -> np.ndarray:
+        return np.unique(self.items)
+
+    def binary_row(self) -> sp.csr_matrix:
+        u = self.unique_items
+        return sp.csr_matrix((np.ones(len(u), np.float32), (np.zeros(len(u), int), u)), shape=(1, self.n_items))
+
+
+@dataclass
 class Recommender:
     name: str = "base"
     fit_seconds: float = field(default=0.0, init=False)
@@ -65,6 +90,10 @@ class Recommender:
         raise NotImplementedError
 
     def score(self, users: np.ndarray) -> np.ndarray:  # pragma: no cover
+        raise NotImplementedError
+
+    def score_history(self, h: "History") -> np.ndarray:
+        """Score the catalogue for an arbitrary interaction history (online / new users)."""
         raise NotImplementedError
 
     def recommend(self, users: np.ndarray, k: int = 10, exclude_seen: bool = True) -> tuple[np.ndarray, np.ndarray]:
@@ -93,6 +122,9 @@ class Popularity(Recommender):
     def score(self, users):
         return np.broadcast_to(self.pop, (len(users), self.pop.size)).copy()
 
+    def score_history(self, h):
+        return self.pop.copy()
+
 
 @dataclass
 class ItemKNN(Recommender):
@@ -112,6 +144,9 @@ class ItemKNN(Recommender):
 
     def score(self, users):
         return np.asarray((self.X[users] @ self.S).todense(), dtype=np.float32)
+
+    def score_history(self, h):
+        return np.asarray((h.binary_row() @ self.S).todense(), dtype=np.float32).ravel()
 
 
 @dataclass
@@ -134,6 +169,9 @@ class EASE(Recommender):
 
     def score(self, users):
         return np.asarray(self.X[users] @ self.B, dtype=np.float32)
+
+    def score_history(self, h):
+        return np.asarray(h.binary_row() @ self.B, dtype=np.float32).ravel()
 
 
 @dataclass
@@ -161,6 +199,13 @@ class RP3Beta(Recommender):
 
     def score(self, users):
         return np.asarray((self.Pui[users] @ self.W).todense(), dtype=np.float32)
+
+    def score_history(self, h):
+        x = h.binary_row()
+        x = x / max(x.sum(), 1)
+        if self.alpha != 1.0:
+            x = x.power(self.alpha)
+        return np.asarray((sp.csr_matrix(x) @ self.W).todense(), dtype=np.float32).ravel()
 
 
 # ---------------------------------------------------------------- latent factor
@@ -203,6 +248,11 @@ class IALS(Recommender):
 
     def score(self, users):
         return self.U[users] @ self.V.T
+
+    def score_history(self, h):
+        if len(h.items) == 0:
+            return np.zeros(self.V.shape[0], np.float32)
+        return self.fold_in(h.unique_items) @ self.V.T
 
     def fold_in(self, item_idx: np.ndarray) -> np.ndarray:
         """Real-time user vector for an arbitrary history (no retraining)."""
@@ -364,6 +414,21 @@ class ContentTFIDF(Recommender):
         prof /= np.linalg.norm(prof, axis=1, keepdims=True) + 1e-9
         return (prof @ self.item_vecs.T).astype(np.float32)
 
+    def score_history(self, h):
+        if len(h.items) == 0:
+            return np.zeros(self.item_vecs.shape[0], np.float32)
+        # last rating per item, decayed to the same reference time as batch scoring
+        last = {}
+        for i, r, t in zip(h.items, h.ratings, h.ts):
+            last[int(i)] = (r, t)
+        idx = np.array(list(last))
+        r = np.array([v[0] for v in last.values()]) - 3.0
+        t = np.array([v[1] for v in last.values()], dtype=np.float64)
+        w = r * 0.5 ** (((self.cutoff_ts - t) / DAY) / self.half_life_days)
+        prof = w @ self.item_vecs[idx]
+        prof = prof / (np.linalg.norm(prof) + 1e-9)
+        return (prof @ self.item_vecs.T).astype(np.float32)
+
 
 @dataclass
 class SemanticLSA(ContentTFIDF):
@@ -435,6 +500,13 @@ class SequentialMarkov(Recommender):
 
     def score(self, users):
         return np.asarray((self.L[users] @ self.T).todense(), dtype=np.float32)
+
+    def score_history(self, h):
+        tail = h.items[-self.last_n:][::-1]
+        x = np.zeros(self.T.shape[0], np.float32)
+        for rk, i in enumerate(tail):
+            x[i] += 0.6 ** rk
+        return np.asarray((sp.csr_matrix(x) @ self.T).todense(), dtype=np.float32).ravel()
 
 
 MODEL_REGISTRY = {

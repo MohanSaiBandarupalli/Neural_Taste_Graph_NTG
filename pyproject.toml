@@ -1,7 +1,7 @@
 [project]
 name = "project-67"
-version = "0.1.0"
-description = "Netflix Neural Taste Graph (NTG) prototype: offline recommender + risk radar."
+version = "4.0.0"
+description = "Neural Taste Graph (NTG) v4: entertainment journey intelligence platform."
 authors = [{ name = "MohanSaiBandarupalli", email = "mb2279@njit.edu" }]
 readme = "README.md"
 requires-python = ">=3.11,<3.12"
@@ -25,6 +25,9 @@ dependencies = [
   "alembic (>=1.13)",
   "lightgbm (>=4.3)",
 ]
+
+[project.scripts]
+ntg = "ntg.cli:main"
 
 [tool.poetry]
 name = "project-67"

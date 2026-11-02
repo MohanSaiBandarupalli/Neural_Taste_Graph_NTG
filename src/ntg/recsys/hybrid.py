@@ -60,7 +60,7 @@ class ChannelSet:
         Gn = d.genre_matrix / np.maximum(d.genre_matrix.sum(1, keepdims=True), 1)
         self.Gn = Gn.astype(np.float32)
         # recent-genre saturation (last 12 events)
-        recent = self.fit_df.sort_values("ts").groupby("u").tail(12)
+        recent = self.fit_df.sort_values("ts", kind="stable").groupby("u").tail(12)
         R = sp.csr_matrix((np.ones(len(recent), np.float32), (recent["u"], recent["i"])), shape=(d.n_users, d.n_items))
         rg = np.asarray(R @ Gn)
         self.recent_genre_share = rg / np.maximum(rg.sum(1, keepdims=True), 1e-9)
@@ -231,3 +231,71 @@ class HybridRanker:
     def contributions(self, X: np.ndarray) -> np.ndarray:
         """Per-feature additive contributions (TreeSHAP) for explanations."""
         return self.model.predict(X, num_iteration=self.model.best_iteration_, pred_contrib=True)
+
+
+def build_candidates_for_history(cs: ChannelSet, h, state: dict, n_per_channel: int = 100,
+                                 exclude: np.ndarray | None = None,
+                                 include: np.ndarray | None = None) -> tuple[pd.DataFrame, np.ndarray, dict]:
+    """Single-viewer equivalent of :func:`build_candidates` for an arbitrary history.
+
+    Produces features in exactly the same order as the batch path so the frozen
+    ranker can score live / brand-new viewers. ``state`` is a TasteTwin
+    ``history_state``. Returns (candidates, features, dense channel scores).
+    """
+    d = cs.data
+    names = list(cs.models)
+    seen = np.zeros(d.n_items, dtype=bool)
+    seen[h.unique_items] = True
+    if exclude is not None and len(exclude):
+        seen[np.asarray(exclude, dtype=np.int64)] = True
+    cand = np.zeros(d.n_items, dtype=bool)
+    prov = np.zeros(d.n_items, dtype=np.int32)
+    feats, dense = [], {}
+    for bit, name in enumerate(names):
+        s = cs.models[name].score_history(h).astype(np.float32).copy()
+        s[seen] = -np.inf
+        k = min(n_per_channel, d.n_items)
+        top = np.argpartition(-s, k - 1)[:k]
+        top = top[np.isfinite(s[top])]
+        cand[top] = True
+        prov[top] |= 1 << bit
+        order = np.argsort(-s, kind="stable")
+        rk = np.empty_like(order)
+        rk[order] = np.arange(d.n_items)
+        dense[name] = (s, rk)
+    if include is not None and len(include):
+        inc = np.asarray(include, dtype=np.int64)
+        cand[inc[~seen[inc]]] = True
+    c = np.flatnonzero(cand)
+    for name in names:
+        s, rk = dense[name]
+        sv = np.where(np.isfinite(s), s, np.nan)
+        feats.append(np.nan_to_num(sv[c], nan=0.0))
+        feats.append(np.log1p(rk[c]).astype(np.float32))
+        mu, sd = np.nanmean(sv), np.nanstd(sv) + 1e-6
+        feats.append(np.nan_to_num((sv[c] - mu) / sd, nan=0.0).astype(np.float32))
+    tt = cs.tt
+    long_s = tt._share(state["S_long"])
+    short_s = tt._share(state["S_short"])
+    nl, ns = np.linalg.norm(long_s), np.linalg.norm(short_s)
+    stab = float(long_s @ short_s / (nl * ns)) if nl > 0 and ns > 0 else 0.0
+    neff = float(state["S_long"].sum())
+    conf = neff / (neff + tt.cfg.confidence_k0)
+    Gi = cs.Gn[c]
+    recent = h.items[-12:]
+    rg = cs.Gn[recent].sum(0) if recent.size else np.zeros(cs.Gn.shape[1])
+    rg = rg / max(rg.sum(), 1e-9)
+    fr = d.franchise_codes
+    fr_counts = np.bincount(fr[h.unique_items], minlength=fr.max() + 1) if h.items.size else np.zeros(fr.max() + 1)
+    days_since = (h.now - h.ts.max()) / 86400.0 if h.items.size else 9999.0
+    n = len(c)
+    feats += [
+        cs.log_pop[c], cs.recent_pop[c].astype(np.float32), cs.item_age[c],
+        np.full(n, np.log1p(h.items.size), np.float32), np.full(n, days_since, np.float32),
+        np.full(n, state["exploration"], np.float32), np.full(n, conf, np.float32), np.full(n, stab, np.float32),
+        (Gi @ long_s).astype(np.float32), (Gi @ short_s).astype(np.float32), (Gi @ (short_s - long_s)).astype(np.float32),
+        (Gi @ rg).astype(np.float32), fr_counts[fr[c]].astype(np.float32),
+        np.array([bin(x).count("1") for x in prov[c]], dtype=np.float32),
+    ]
+    df = pd.DataFrame({"i": c, "provenance": prov[c]})
+    return df, np.vstack(feats).T.astype(np.float32), {k: v[0] for k, v in dense.items()}

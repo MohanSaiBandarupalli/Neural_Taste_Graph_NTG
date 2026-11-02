@@ -28,8 +28,20 @@ _FEATURE_TEXT = {
 }
 
 
+GROUNDING = "All reasons are computed from model internals (item-kNN similarity, TasteTwin state, TreeSHAP); none are generated text."
+
+
 def channel_names(provenance: int, channels: list[str]) -> list[str]:
     return [c for b, c in enumerate(channels) if provenance >> b & 1]
+
+
+def ranker_drivers(contrib: np.ndarray | None, feature_names: list[str], top: int = 4) -> list[dict]:
+    if contrib is None:
+        return []
+    vals = np.asarray(contrib)[:-1]  # last column is the bias term
+    return [{"feature": feature_names[j], "contribution": float(vals[j]),
+             "text": _FEATURE_TEXT.get(feature_names[j], feature_names[j].replace("_", " "))}
+            for j in np.argsort(-vals)[:top] if vals[j] > 0]
 
 
 def explain(u: int, i: int, *, cs, provenance: int, contrib: np.ndarray | None, feature_names: list[str],
@@ -67,18 +79,11 @@ def explain(u: int, i: int, *, cs, provenance: int, contrib: np.ndarray | None, 
         hg = sorted(set(genres) & hidden_genres)
         reasons.append({"type": "hidden_interest", "text": f"A discovery pick: viewers like you enjoy {', '.join(hg)} more than your history shows",
                         "evidence": [{"genre": g} for g in hg]})
-    # 3) ranker drivers
-    drivers = []
-    if contrib is not None:
-        vals = contrib[:-1]  # last column is the bias term
-        for j in np.argsort(-vals)[:4]:
-            if vals[j] > 0:
-                drivers.append({"feature": feature_names[j], "contribution": float(vals[j]),
-                                "text": _FEATURE_TEXT.get(feature_names[j], feature_names[j].replace("_", " "))})
+    drivers = ranker_drivers(contrib, feature_names)
     chans = channel_names(provenance, list(cs.models))
     return {
         "reasons": reasons,
         "retrieved_by": chans,
         "ranker_drivers": drivers,
-        "grounding": "All reasons are computed from model internals (item-kNN similarity, TasteTwin state, TreeSHAP); none are generated text.",
+        "grounding": GROUNDING,
     }

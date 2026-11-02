@@ -71,13 +71,14 @@ class TasteTwin:
         self.global_share = self.S_long.sum(0) / max(self.S_long.sum(), 1e-9)
 
         # Exploration: recent genre entropy + long-tail share
-        recent = fit_df.sort_values("ts").groupby("u").tail(c.recent_events)
+        recent = fit_df.sort_values("ts", kind="stable").groupby("u").tail(c.recent_events)
         R = sp.csr_matrix((np.ones(len(recent)), (recent["u"], recent["i"])), shape=shape)
         Rg = np.asarray(R @ self.G)
         p = Rg / np.maximum(Rg.sum(1, keepdims=True), 1e-9)
         ent = -(np.where(p > 0, p * np.log(p + 1e-12), 0)).sum(1) / np.log(len(self.genres))
         pop = d.popularity(fit_df)
         tail = pop < np.quantile(pop[pop > 0], 0.8) if (pop > 0).any() else np.zeros_like(pop, bool)
+        self.tail_mask = tail
         tail_share = np.asarray(R @ tail.astype(np.float64)).ravel() / np.maximum(np.asarray(R.sum(1)).ravel(), 1)
         self.exploration = np.clip(0.7 * ent + 0.3 * tail_share, 0, 1)
 
@@ -92,7 +93,9 @@ class TasteTwin:
                     if t in tidx:
                         T[r, tidx[t]] = 1.0
             self.S_theme = np.asarray(W_long @ T)
+            self.T_items = T
         else:
+            self.T_items = None
             self.S_theme = np.zeros((d.n_users, 0))
         self.embedding = embedding
         self._history_df = fit_df[["u", "i", "rating", "ts"]]
@@ -158,42 +161,69 @@ class TasteTwin:
         p = blend * self.short_share(users) + (1 - blend) * self.long_share(users)
         return (1 - shrink) * p + shrink * self.global_share
 
-    # ------------------------------------------------------------------ profile
-    def profile(self, u: int, top: int = 6) -> dict:
-        long_s, short_s = self.long_share([u])[0], self.short_share([u])[0]
+    # ------------------------------------------------------------------ single-user state
+    def history_state(self, items, ratings, ts, now: int) -> dict:
+        """TasteTwin state for an arbitrary history (live / new users), decayed to ``now``."""
+        c = self.cfg
+        items = np.asarray(items, dtype=np.int64)
+        ratings = np.asarray(ratings, dtype=np.float64)
+        ts = np.asarray(ts, dtype=np.int64)
+        n_g = len(self.genres)
+        if items.size == 0:
+            return {"S_long": np.zeros(n_g), "S_short": np.zeros(n_g), "exploration": 0.5, "n_events": 0,
+                    "last_ts": -1, "S_theme": np.zeros(len(self.theme_vocab)), "as_of": int(now)}
+        age = (now - ts) / DAY
+        w = preference_weight(ratings)
+        wl = w * 0.5 ** (age / c.half_life_long_days)
+        ws = w * 0.5 ** (age / c.half_life_short_days)
+        order = np.argsort(ts, kind="stable")
+        recent = items[order][-c.recent_events:]
+        rg = self.G[recent].sum(0)
+        pr = rg / max(rg.sum(), 1e-9)
+        ent = -(np.where(pr > 0, pr * np.log(pr + 1e-12), 0)).sum() / np.log(n_g)
+        tail_share = float(self.tail_mask[recent].mean()) if recent.size else 0.0
+        S_theme = (wl @ self.T_items[items]) if self.T_items is not None else np.zeros(0)
+        return {"S_long": wl @ self.G[items], "S_short": ws @ self.G[items],
+                "exploration": float(np.clip(0.7 * ent + 0.3 * tail_share, 0, 1)), "n_events": int(items.size),
+                "last_ts": int(ts.max()), "S_theme": S_theme, "as_of": int(now)}
+
+    def state_of(self, u: int) -> dict:
+        return {"S_long": self.S_long[u], "S_short": self.S_short[u], "exploration": float(self.exploration[u]),
+                "n_events": int(self.n_events[u]), "last_ts": int(self.last_ts[u]), "S_theme": self.S_theme[u],
+                "as_of": int(max(self.cutoff_ts, self.last_ts[u]))}
+
+    def profile_from_state(self, st: dict, top: int = 6, user_index: int | None = None) -> dict:
+        c = self.cfg
+        long_s, short_s = self._share(st["S_long"]), self._share(st["S_short"])
         mom = short_s - long_s
-        unc = self.uncertainty([u])[0]
+        n = float(st["S_long"].sum())
+        a = st["S_long"] + c.prior_strength * self.global_share
+        b = (n - st["S_long"]) + c.prior_strength * (1 - self.global_share)
+        unc = np.sqrt(a * b / ((a + b) ** 2 * (a + b + 1)))
+        nl, ns = np.linalg.norm(long_s), np.linalg.norm(short_s)
+        stability = float((long_s @ short_s) / (nl * ns)) if nl > 0 and ns > 0 else 0.0
+        conf = n / (n + c.confidence_k0)
         g = self.genres
-        order = np.argsort(-long_s)
-        emerging = [
-            {"genre": g[k], "momentum": float(mom[k]), "short_share": float(short_s[k])}
-            for k in np.argsort(-mom) if mom[k] > self.cfg.emerging_threshold
-        ][:3]
-        declining = [
-            {"genre": g[k], "momentum": float(mom[k]), "long_share": float(long_s[k])}
-            for k in np.argsort(mom) if mom[k] < -self.cfg.emerging_threshold
-        ][:3]
         themes = []
-        if self.S_theme.shape[1]:
-            st = self.S_theme[u]
-            themes = [{"theme": self.theme_vocab[k], "weight": float(st[k] / max(st.sum(), 1e-9))}
-                      for k in np.argsort(-st)[:5] if st[k] > 0]
-        conf = float(self.confidence([u])[0])
+        st_t = st["S_theme"]
+        if len(st_t) and st_t.sum() > 0:
+            themes = [{"theme": self.theme_vocab[k], "weight": float(st_t[k] / st_t.sum())} for k in np.argsort(-st_t)[:5] if st_t[k] > 0]
         return {
-            "user_index": int(u),
-            "as_of_ts": int(max(self.cutoff_ts, self.last_ts[u])),
-            "n_events": int(self.n_events[u]),
-            "effective_sample_size": float(self.n_eff([u])[0]),
-            "confidence": conf,
+            "user_index": user_index,
+            "as_of_ts": int(st["as_of"]),
+            "n_events": int(st["n_events"]),
+            "effective_sample_size": n,
+            "confidence": float(conf),
             "confidence_label": "high" if conf > 0.8 else "medium" if conf > 0.5 else "low",
-            "stability": float(self.stability([u])[0]),
-            "exploration_willingness": float(self.exploration[u]),
+            "stability": stability,
+            "exploration_willingness": float(st["exploration"]),
             "long_term": [{"genre": g[k], "share": float(long_s[k]), "uncertainty": float(unc[k])}
-                          for k in order[:top] if long_s[k] > 0],
-            "short_term": [{"genre": g[k], "share": float(short_s[k])}
-                           for k in np.argsort(-short_s)[:top] if short_s[k] > 0],
-            "emerging": emerging,
-            "declining": declining,
+                          for k in np.argsort(-long_s)[:top] if long_s[k] > 0],
+            "short_term": [{"genre": g[k], "share": float(short_s[k])} for k in np.argsort(-short_s)[:top] if short_s[k] > 0],
+            "emerging": [{"genre": g[k], "momentum": float(mom[k]), "short_share": float(short_s[k])}
+                         for k in np.argsort(-mom) if mom[k] > c.emerging_threshold][:3],
+            "declining": [{"genre": g[k], "momentum": float(mom[k]), "long_share": float(long_s[k])}
+                          for k in np.argsort(mom) if mom[k] < -c.emerging_threshold][:3],
             "themes": themes,
             "unavailable_dimensions": {
                 "content_format": "dataset contains films only (no series/episode data)",
@@ -201,6 +231,9 @@ class TasteTwin:
             },
             "provenance": "inferred from viewing history (time-decayed); not stated by the viewer",
         }
+
+    def profile(self, u: int, top: int = 6) -> dict:
+        return self.profile_from_state(self.state_of(u), top=top, user_index=int(u))
 
     def evolution(self, u: int, freq_days: int = 90, max_points: int = 16) -> list[dict]:
         """Genre-share snapshots over time for the taste-evolution chart."""
