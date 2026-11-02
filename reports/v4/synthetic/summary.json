@@ -1,0 +1,15 @@
+{
+  "dataset": "synthetic",
+  "version": "synthetic-20261102051854-1333e554",
+  "is_synthetic": true,
+  "reports": [
+    "benchmark.json",
+    "engagement_risk.json",
+    "fatigue.json",
+    "hidden_interests.json",
+    "journey.json",
+    "performance.json",
+    "tastetwin.json",
+    "tuning.json"
+  ]
+}

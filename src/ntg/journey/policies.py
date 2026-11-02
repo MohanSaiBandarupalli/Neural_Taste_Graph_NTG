@@ -12,6 +12,9 @@ import numpy as np
 
 
 def _norm(x: np.ndarray) -> np.ndarray:
+    fin = np.isfinite(x)
+    if not fin.all():
+        x = np.where(fin, x, x[fin].min() if fin.any() else 0.0)
     lo, hi = x.min(), x.max()
     return (x - lo) / (hi - lo) if hi > lo else np.zeros_like(x)
 

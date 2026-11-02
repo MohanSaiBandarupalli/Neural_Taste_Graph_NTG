@@ -51,7 +51,7 @@ notebooks/.ipynb_checkpoints/
 # ===============================
 # Reports / Generated Artifacts
 # ===============================
-reports/
+reports/*
 outputs/
 logs/
 reports/runs/
@@ -76,5 +76,14 @@ Thumbs.db
 tmp/
 .cache/
 
-# Keep small JSON reports tracked (optional)
-!reports/*.json*.pyc
+# Keep small JSON reports tracked: they are the evidence behind every documented number
+!reports/*.json
+!reports/v4/
+*.pyc
+
+# v4 model artifacts and app database (rebuilt by `ntg build`)
+artifacts/
+data/v4/
+frontend/node_modules/
+frontend/.next/
+

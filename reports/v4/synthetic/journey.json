@@ -1,0 +1,691 @@
+{
+  "evidence_type": "simulated",
+  "default_world": {
+    "evidence_type": "simulated",
+    "world": {
+      "steps": 25,
+      "slate_size": 5,
+      "fatigue_sensitivity": 1.0,
+      "fatigue_memory": 0.7,
+      "repeat_window": 3,
+      "repeat_penalty": 0.4,
+      "discovery_bonus": 0.5,
+      "leave_base": 0.02,
+      "leave_fatigue": 0.15,
+      "leave_reject": 0.1,
+      "like_scale": 0.6,
+      "position_decay": 0.85,
+      "seed": 0
+    },
+    "world_model": {
+      "oracle": "EASE+RP3beta fitted on all data (incl. future)",
+      "policy_model": "ease",
+      "n_candidates": 300
+    },
+    "policies": {
+      "greedy_relevance": {
+        "n_users": 300,
+        "immediate_accept_rate": 0.9433333333333334,
+        "accepts_per_journey": 6.06,
+        "accepts_ci95": [
+          5.5365,
+          6.617
+        ],
+        "satisfaction_per_journey": 5.917426646202992,
+        "satisfaction_ci95": [
+          5.425499736495823,
+          6.380909211410924
+        ],
+        "sessions_before_leaving": 11.48,
+        "genres_discovered": 1.0566666666666666,
+        "consecutive_same_genre_rate": 0.08567126337714573,
+        "slate_freshness": 0.2642688408293321,
+        "satisfaction_lift_vs_greedy": 0.0,
+        "satisfaction_lift_vs_greedy_ci95": [
+          0.0,
+          0.0
+        ],
+        "satisfaction_lift_ci95": [
+          0.0,
+          0.0
+        ],
+        "satisfaction_lift_vs_greedy_fresh": -4.352868026725044,
+        "satisfaction_lift_vs_greedy_fresh_ci95": [
+          -5.102101381462978,
+          -3.5689743185024683
+        ]
+      },
+      "greedy_fresh": {
+        "n_users": 300,
+        "immediate_accept_rate": 0.9433333333333334,
+        "accepts_per_journey": 11.31,
+        "accepts_ci95": [
+          10.539,
+          12.037083333333332
+        ],
+        "satisfaction_per_journey": 10.270294672928037,
+        "satisfaction_ci95": [
+          9.677850081412766,
+          10.888091043309919
+        ],
+        "sessions_before_leaving": 14.373333333333333,
+        "genres_discovered": 1.85,
+        "consecutive_same_genre_rate": 0.11661893030305667,
+        "slate_freshness": 0.5184304017103081,
+        "satisfaction_lift_vs_greedy": 4.352868026725044,
+        "satisfaction_lift_vs_greedy_ci95": [
+          3.568974318502468,
+          5.102101381462978
+        ],
+        "satisfaction_lift_ci95": [
+          3.568974318502468,
+          5.102101381462978
+        ],
+        "satisfaction_lift_vs_greedy_fresh": 0.0,
+        "satisfaction_lift_vs_greedy_fresh_ci95": [
+          0.0,
+          0.0
+        ]
+      },
+      "mmr_diversity": {
+        "n_users": 300,
+        "immediate_accept_rate": 0.9566666666666667,
+        "accepts_per_journey": 6.87,
+        "accepts_ci95": [
+          6.409833333333333,
+          7.400333333333333
+        ],
+        "satisfaction_per_journey": 6.658375993996152,
+        "satisfaction_ci95": [
+          6.16258109677296,
+          7.141322706703568
+        ],
+        "sessions_before_leaving": 12.003333333333334,
+        "genres_discovered": 1.5166666666666666,
+        "consecutive_same_genre_rate": 0.07685935714612185,
+        "slate_freshness": 0.2678929118928015,
+        "satisfaction_lift_vs_greedy": 0.7409493477931602,
+        "satisfaction_lift_vs_greedy_ci95": [
+          0.12919130806846663,
+          1.3267311117258105
+        ],
+        "satisfaction_lift_ci95": [
+          0.12919130806846663,
+          1.3267311117258105
+        ],
+        "satisfaction_lift_vs_greedy_fresh": -3.611918678931884,
+        "satisfaction_lift_vs_greedy_fresh_ci95": [
+          -4.392494954588809,
+          -2.9012633368669936
+        ]
+      },
+      "epsilon_greedy": {
+        "n_users": 300,
+        "immediate_accept_rate": 0.91,
+        "accepts_per_journey": 5.8966666666666665,
+        "accepts_ci95": [
+          5.456666666666667,
+          6.350333333333333
+        ],
+        "satisfaction_per_journey": 5.554924416286202,
+        "satisfaction_ci95": [
+          5.115236735743461,
+          6.024488958636318
+        ],
+        "sessions_before_leaving": 11.536666666666667,
+        "genres_discovered": 1.0966666666666667,
+        "consecutive_same_genre_rate": 0.07867991077549902,
+        "slate_freshness": 0.4291971162479664,
+        "satisfaction_lift_vs_greedy": -0.3625022299167908,
+        "satisfaction_lift_vs_greedy_ci95": [
+          -0.9067477619520862,
+          0.21854594587499013
+        ],
+        "satisfaction_lift_ci95": [
+          -0.9067477619520862,
+          0.21854594587499013
+        ],
+        "satisfaction_lift_vs_greedy_fresh": -4.715370256641836,
+        "satisfaction_lift_vs_greedy_fresh_ci95": [
+          -5.502814974454082,
+          -3.9421470914136445
+        ]
+      },
+      "genre_thompson": {
+        "n_users": 300,
+        "immediate_accept_rate": 0.9233333333333333,
+        "accepts_per_journey": 7.196666666666666,
+        "accepts_ci95": [
+          6.601583333333333,
+          7.810499999999999
+        ],
+        "satisfaction_per_journey": 6.540018379609222,
+        "satisfaction_ci95": [
+          6.052196046371348,
+          6.943952314610513
+        ],
+        "sessions_before_leaving": 12.21,
+        "genres_discovered": 0.9433333333333334,
+        "consecutive_same_genre_rate": 0.08440437666908254,
+        "slate_freshness": 0.4373743489542171,
+        "satisfaction_lift_vs_greedy": 0.6225917334062299,
+        "satisfaction_lift_vs_greedy_ci95": [
+          -0.036680000093855844,
+          1.2730595478145637
+        ],
+        "satisfaction_lift_ci95": [
+          -0.036680000093855844,
+          1.2730595478145637
+        ],
+        "satisfaction_lift_vs_greedy_fresh": -3.7302762933188145,
+        "satisfaction_lift_vs_greedy_fresh_ci95": [
+          -4.533538210975991,
+          -2.9681402386944993
+        ]
+      },
+      "journey_orchestrator": {
+        "n_users": 300,
+        "immediate_accept_rate": 0.9666666666666667,
+        "accepts_per_journey": 12.813333333333333,
+        "accepts_ci95": [
+          12.062833333333334,
+          13.705916666666665
+        ],
+        "satisfaction_per_journey": 11.48096110904481,
+        "satisfaction_ci95": [
+          10.857930062823536,
+          12.170120253647251
+        ],
+        "sessions_before_leaving": 15.536666666666667,
+        "genres_discovered": 2.59,
+        "consecutive_same_genre_rate": 0.040287829454288604,
+        "slate_freshness": 0.5206454289746637,
+        "satisfaction_lift_vs_greedy": 5.563534462841816,
+        "satisfaction_lift_vs_greedy_ci95": [
+          4.823889230862788,
+          6.299122156991277
+        ],
+        "satisfaction_lift_ci95": [
+          4.823889230862788,
+          6.299122156991277
+        ],
+        "satisfaction_lift_vs_greedy_fresh": 1.2106664361167714,
+        "satisfaction_lift_vs_greedy_fresh_ci95": [
+          0.3193020707504816,
+          2.109376712996319
+        ]
+      }
+    }
+  },
+  "sensitivity_fatigue": {
+    "evidence_type": "simulated",
+    "parameter": "fatigue_sensitivity",
+    "rows": [
+      {
+        "fatigue_sensitivity": 0.0,
+        "greedy_relevance": {
+          "satisfaction": 8.537181337029677,
+          "accepts": 8.966666666666667,
+          "sessions": 13.97,
+          "lift_vs_greedy": 0.0,
+          "lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "lift_vs_greedy_fresh": -5.807684729561468,
+          "lift_vs_greedy_fresh_ci95": [
+            -6.640045475815063,
+            -4.981294493238477
+          ]
+        },
+        "greedy_fresh": {
+          "satisfaction": 14.344866066591145,
+          "accepts": 16.14,
+          "sessions": 18.246666666666666,
+          "lift_vs_greedy": 5.807684729561468,
+          "lift_ci95": [
+            4.981294493238477,
+            6.640045475815062
+          ],
+          "lift_vs_greedy_fresh": 0.0,
+          "lift_vs_greedy_fresh_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mmr_diversity": {
+          "satisfaction": 8.651348565971666,
+          "accepts": 9.146666666666667,
+          "sessions": 14.22,
+          "lift_vs_greedy": 0.11416722894198929,
+          "lift_ci95": [
+            -0.7331345528202939,
+            0.8248217817278154
+          ],
+          "lift_vs_greedy_fresh": -5.693517500619479,
+          "lift_vs_greedy_fresh_ci95": [
+            -6.640987865880514,
+            -4.885130278830993
+          ]
+        },
+        "journey_orchestrator": {
+          "satisfaction": 14.317699365286735,
+          "accepts": 16.096666666666668,
+          "sessions": 18.406666666666666,
+          "lift_vs_greedy": 5.78051802825706,
+          "lift_ci95": [
+            4.991741850661185,
+            6.608956104389165
+          ],
+          "lift_vs_greedy_fresh": -0.02716670130441007,
+          "lift_vs_greedy_fresh_ci95": [
+            -1.0289450976715022,
+            0.928373728169033
+          ]
+        }
+      },
+      {
+        "fatigue_sensitivity": 0.5,
+        "greedy_relevance": {
+          "satisfaction": 7.166945368627274,
+          "accepts": 7.423333333333333,
+          "sessions": 12.44,
+          "lift_vs_greedy": 0.0,
+          "lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "lift_vs_greedy_fresh": -4.207558951787817,
+          "lift_vs_greedy_fresh_ci95": [
+            -5.084194717257766,
+            -3.250517080813823
+          ]
+        },
+        "greedy_fresh": {
+          "satisfaction": 11.374504320415092,
+          "accepts": 12.656666666666666,
+          "sessions": 14.856666666666667,
+          "lift_vs_greedy": 4.207558951787817,
+          "lift_ci95": [
+            3.250517080813822,
+            5.084194717257766
+          ],
+          "lift_vs_greedy_fresh": 0.0,
+          "lift_vs_greedy_fresh_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mmr_diversity": {
+          "satisfaction": 7.504429842896247,
+          "accepts": 7.79,
+          "sessions": 12.813333333333333,
+          "lift_vs_greedy": 0.33748447426897327,
+          "lift_ci95": [
+            -0.4138145642463812,
+            1.0022378302122084
+          ],
+          "lift_vs_greedy_fresh": -3.870074477518845,
+          "lift_vs_greedy_fresh_ci95": [
+            -4.880735641563674,
+            -2.985910393889914
+          ]
+        },
+        "journey_orchestrator": {
+          "satisfaction": 12.380537523708595,
+          "accepts": 13.8,
+          "sessions": 16.286666666666665,
+          "lift_vs_greedy": 5.2135921550813205,
+          "lift_ci95": [
+            4.337598027173136,
+            6.123726361090881
+          ],
+          "lift_vs_greedy_fresh": 1.0060332032935029,
+          "lift_vs_greedy_fresh_ci95": [
+            0.059449817396262004,
+            1.9773394168328888
+          ]
+        }
+      },
+      {
+        "fatigue_sensitivity": 1.0,
+        "greedy_relevance": {
+          "satisfaction": 5.917426646202992,
+          "accepts": 6.06,
+          "sessions": 11.48,
+          "lift_vs_greedy": 0.0,
+          "lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "lift_vs_greedy_fresh": -4.352868026725044,
+          "lift_vs_greedy_fresh_ci95": [
+            -5.102101381462978,
+            -3.5689743185024683
+          ]
+        },
+        "greedy_fresh": {
+          "satisfaction": 10.270294672928037,
+          "accepts": 11.31,
+          "sessions": 14.373333333333333,
+          "lift_vs_greedy": 4.352868026725044,
+          "lift_ci95": [
+            3.568974318502468,
+            5.102101381462978
+          ],
+          "lift_vs_greedy_fresh": 0.0,
+          "lift_vs_greedy_fresh_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mmr_diversity": {
+          "satisfaction": 6.658375993996152,
+          "accepts": 6.87,
+          "sessions": 12.003333333333334,
+          "lift_vs_greedy": 0.7409493477931602,
+          "lift_ci95": [
+            0.12919130806846663,
+            1.3267311117258105
+          ],
+          "lift_vs_greedy_fresh": -3.611918678931884,
+          "lift_vs_greedy_fresh_ci95": [
+            -4.392494954588809,
+            -2.9012633368669936
+          ]
+        },
+        "journey_orchestrator": {
+          "satisfaction": 11.48096110904481,
+          "accepts": 12.813333333333333,
+          "sessions": 15.536666666666667,
+          "lift_vs_greedy": 5.563534462841816,
+          "lift_ci95": [
+            4.823889230862788,
+            6.299122156991277
+          ],
+          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh_ci95": [
+            0.3193020707504816,
+            2.109376712996319
+          ]
+        }
+      },
+      {
+        "fatigue_sensitivity": 1.5,
+        "greedy_relevance": {
+          "satisfaction": 5.287314939907489,
+          "accepts": 5.323333333333333,
+          "sessions": 10.843333333333334,
+          "lift_vs_greedy": 0.0,
+          "lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "lift_vs_greedy_fresh": -4.138404167712938,
+          "lift_vs_greedy_fresh_ci95": [
+            -4.979226748768737,
+            -3.3220634358361116
+          ]
+        },
+        "greedy_fresh": {
+          "satisfaction": 9.425719107620425,
+          "accepts": 10.316666666666666,
+          "sessions": 13.6,
+          "lift_vs_greedy": 4.138404167712938,
+          "lift_ci95": [
+            3.322063435836111,
+            4.9792267487687365
+          ],
+          "lift_vs_greedy_fresh": 0.0,
+          "lift_vs_greedy_fresh_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mmr_diversity": {
+          "satisfaction": 6.478857674249573,
+          "accepts": 6.6,
+          "sessions": 11.97,
+          "lift_vs_greedy": 1.1915427343420837,
+          "lift_ci95": [
+            0.5793698295370601,
+            1.8221527011082823
+          ],
+          "lift_vs_greedy_fresh": -2.946861433370854,
+          "lift_vs_greedy_fresh_ci95": [
+            -3.7649604555660217,
+            -2.220749887143381
+          ]
+        },
+        "journey_orchestrator": {
+          "satisfaction": 11.251750639809451,
+          "accepts": 12.493333333333334,
+          "sessions": 15.42,
+          "lift_vs_greedy": 5.964435699901964,
+          "lift_ci95": [
+            5.220812262213483,
+            6.701655509944019
+          ],
+          "lift_vs_greedy_fresh": 1.8260315321890266,
+          "lift_vs_greedy_fresh_ci95": [
+            0.9881441180766655,
+            2.59088623964495
+          ]
+        }
+      }
+    ]
+  },
+  "sensitivity_repetition": {
+    "evidence_type": "simulated",
+    "parameter": "repeat_penalty",
+    "rows": [
+      {
+        "repeat_penalty": 1.0,
+        "greedy_relevance": {
+          "satisfaction": 10.03944255616737,
+          "accepts": 10.72,
+          "sessions": 13.466666666666667,
+          "lift_vs_greedy": 0.0,
+          "lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "lift_vs_greedy_fresh": -0.23085211676066758,
+          "lift_vs_greedy_fresh_ci95": [
+            -1.159284162242303,
+            0.7949384192979356
+          ]
+        },
+        "greedy_fresh": {
+          "satisfaction": 10.270294672928037,
+          "accepts": 11.31,
+          "sessions": 14.373333333333333,
+          "lift_vs_greedy": 0.23085211676066758,
+          "lift_ci95": [
+            -0.7949384192979357,
+            1.1592841622423027
+          ],
+          "lift_vs_greedy_fresh": 0.0,
+          "lift_vs_greedy_fresh_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mmr_diversity": {
+          "satisfaction": 11.166501833575898,
+          "accepts": 12.03,
+          "sessions": 14.34,
+          "lift_vs_greedy": 1.1270592774085302,
+          "lift_ci95": [
+            0.31168550176385607,
+            1.9196991150516043
+          ],
+          "lift_vs_greedy_fresh": 0.8962071606478627,
+          "lift_vs_greedy_fresh_ci95": [
+            -0.03381965562949972,
+            1.7850146194017038
+          ]
+        },
+        "journey_orchestrator": {
+          "satisfaction": 11.48096110904481,
+          "accepts": 12.813333333333333,
+          "sessions": 15.536666666666667,
+          "lift_vs_greedy": 1.4415185528774388,
+          "lift_ci95": [
+            0.45436234708579504,
+            2.3430367888226677
+          ],
+          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh_ci95": [
+            0.3193020707504816,
+            2.109376712996319
+          ]
+        }
+      },
+      {
+        "repeat_penalty": 0.7,
+        "greedy_relevance": {
+          "satisfaction": 8.396550638410796,
+          "accepts": 8.78,
+          "sessions": 12.683333333333334,
+          "lift_vs_greedy": 0.0,
+          "lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "lift_vs_greedy_fresh": -1.87374403451724,
+          "lift_vs_greedy_fresh_ci95": [
+            -2.7223510365229022,
+            -1.0724064493838705
+          ]
+        },
+        "greedy_fresh": {
+          "satisfaction": 10.270294672928037,
+          "accepts": 11.31,
+          "sessions": 14.373333333333333,
+          "lift_vs_greedy": 1.87374403451724,
+          "lift_ci95": [
+            1.07240644938387,
+            2.722351036522902
+          ],
+          "lift_vs_greedy_fresh": 0.0,
+          "lift_vs_greedy_fresh_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mmr_diversity": {
+          "satisfaction": 9.768375846982787,
+          "accepts": 10.38,
+          "sessions": 14.2,
+          "lift_vs_greedy": 1.3718252085719906,
+          "lift_ci95": [
+            0.5025277333958562,
+            2.3214016440493155
+          ],
+          "lift_vs_greedy_fresh": -0.5019188259452492,
+          "lift_vs_greedy_fresh_ci95": [
+            -1.4756575887590777,
+            0.34527381195276996
+          ]
+        },
+        "journey_orchestrator": {
+          "satisfaction": 11.48096110904481,
+          "accepts": 12.813333333333333,
+          "sessions": 15.536666666666667,
+          "lift_vs_greedy": 3.0844104706340114,
+          "lift_ci95": [
+            2.238855786650949,
+            3.9093910310719395
+          ],
+          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh_ci95": [
+            0.3193020707504816,
+            2.109376712996319
+          ]
+        }
+      },
+      {
+        "repeat_penalty": 0.4,
+        "greedy_relevance": {
+          "satisfaction": 5.917426646202992,
+          "accepts": 6.06,
+          "sessions": 11.48,
+          "lift_vs_greedy": 0.0,
+          "lift_ci95": [
+            0.0,
+            0.0
+          ],
+          "lift_vs_greedy_fresh": -4.352868026725044,
+          "lift_vs_greedy_fresh_ci95": [
+            -5.102101381462978,
+            -3.5689743185024683
+          ]
+        },
+        "greedy_fresh": {
+          "satisfaction": 10.270294672928037,
+          "accepts": 11.31,
+          "sessions": 14.373333333333333,
+          "lift_vs_greedy": 4.352868026725044,
+          "lift_ci95": [
+            3.568974318502468,
+            5.102101381462978
+          ],
+          "lift_vs_greedy_fresh": 0.0,
+          "lift_vs_greedy_fresh_ci95": [
+            0.0,
+            0.0
+          ]
+        },
+        "mmr_diversity": {
+          "satisfaction": 6.658375993996152,
+          "accepts": 6.87,
+          "sessions": 12.003333333333334,
+          "lift_vs_greedy": 0.7409493477931602,
+          "lift_ci95": [
+            0.12919130806846663,
+            1.3267311117258105
+          ],
+          "lift_vs_greedy_fresh": -3.611918678931884,
+          "lift_vs_greedy_fresh_ci95": [
+            -4.392494954588809,
+            -2.9012633368669936
+          ]
+        },
+        "journey_orchestrator": {
+          "satisfaction": 11.48096110904481,
+          "accepts": 12.813333333333333,
+          "sessions": 15.536666666666667,
+          "lift_vs_greedy": 5.563534462841816,
+          "lift_ci95": [
+            4.823889230862788,
+            6.299122156991277
+          ],
+          "lift_vs_greedy_fresh": 1.2106664361167714,
+          "lift_vs_greedy_fresh_ci95": [
+            0.3193020707504816,
+            2.109376712996319
+          ]
+        }
+      }
+    ]
+  },
+  "off_policy_evaluation": {
+    "evidence_type": "simulated",
+    "protocol": "logging = \u03b5-greedy over top-20 (known propensities); target = greedy top-1; first session, single slot",
+    "epsilon": 0.3,
+    "n_logged": 20000,
+    "true_target_value": 0.5939085033578556,
+    "ips_estimate": 0.5972727272727274,
+    "ips_ci95": [
+      0.5879650349650349,
+      0.6065839160839162
+    ],
+    "snips_estimate": 0.591563928521956,
+    "snips_ci95": [
+      0.5832022491679452,
+      0.5991706923176569
+    ],
+    "naive_logged_average": 0.56975
+  }
+}

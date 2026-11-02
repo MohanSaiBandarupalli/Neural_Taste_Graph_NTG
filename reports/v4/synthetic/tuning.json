@@ -1,0 +1,104 @@
+{
+  "selected": {
+    "ease": {
+      "l2": 800.0
+    },
+    "rp3beta": {
+      "alpha": 0.8,
+      "beta": 0.6
+    },
+    "itemknn": {
+      "k": 20,
+      "shrink": 10.0
+    },
+    "ials": {
+      "factors": 16,
+      "reg": 1.0,
+      "alpha": 5.0
+    },
+    "popularity": {
+      "half_life_days": 180.0
+    }
+  },
+  "trace": {
+    "ease": [
+      {
+        "params": {
+          "l2": 300.0
+        },
+        "ndcg@10": 0.1098459427449542
+      },
+      {
+        "params": {
+          "l2": 800.0
+        },
+        "ndcg@10": 0.11794983138782099
+      }
+    ],
+    "rp3beta": [
+      {
+        "params": {
+          "alpha": 0.8,
+          "beta": 0.4
+        },
+        "ndcg@10": 0.10745209107111892
+      },
+      {
+        "params": {
+          "alpha": 0.8,
+          "beta": 0.6
+        },
+        "ndcg@10": 0.1191855441168052
+      }
+    ],
+    "itemknn": [
+      {
+        "params": {
+          "k": 20,
+          "shrink": 10.0
+        },
+        "ndcg@10": 0.11752640656988958
+      },
+      {
+        "params": {
+          "k": 50,
+          "shrink": 10.0
+        },
+        "ndcg@10": 0.11558456343503298
+      }
+    ],
+    "ials": [
+      {
+        "params": {
+          "factors": 16,
+          "reg": 1.0,
+          "alpha": 5.0
+        },
+        "ndcg@10": 0.11934531388478889
+      },
+      {
+        "params": {
+          "factors": 16,
+          "reg": 1.0,
+          "alpha": 10.0
+        },
+        "ndcg@10": 0.11538542488347342
+      }
+    ],
+    "popularity": [
+      {
+        "params": {
+          "half_life_days": 30.0
+        },
+        "ndcg@10": 0.06410353084253766
+      },
+      {
+        "params": {
+          "half_life_days": 180.0
+        },
+        "ndcg@10": 0.06416489148034143
+      }
+    ]
+  },
+  "selection_metric": "ndcg@10 on VAL window"
+}

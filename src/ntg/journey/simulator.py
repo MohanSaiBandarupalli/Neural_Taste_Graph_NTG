@@ -70,6 +70,7 @@ def build_world(data, cs, full_df, users: np.ndarray, n_candidates: int = 300, r
     seen = cs.X[users]
     r, c = seen.nonzero()
     s[r, c] = -np.inf
+    n_candidates = min(n_candidates, int(np.isfinite(s).sum(1).min()))
     cand, rel = topk_rows(s, n_candidates)
     oracle_a = EASE().fit(data, full_df)
     oracle_b = RP3Beta().fit(data, full_df)
