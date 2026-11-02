@@ -17,6 +17,12 @@ dependencies = [
   "tabulate (>=0.9.0,<0.10.0)",
   "plotly (>=6.5.2,<7.0.0)",
   "kaleido (>=1.2.0,<2.0.0)",
+  "fastapi (>=0.115)",
+  "uvicorn (>=0.30)",
+  "sqlalchemy (>=2.0)",
+  "pyjwt (>=2.9)",
+  "pyyaml (>=6.0)",
+  "alembic (>=1.13)",
 ]
 
 [tool.poetry]
@@ -30,6 +36,8 @@ packages = [{ include = "ntg", from = "src" }]
 [tool.poetry.group.dev.dependencies]
 pytest = "^9.0.0"
 pytest-cov = "^6.0.0"
+httpx = ">=0.27"
+ruff = ">=0.6"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]
