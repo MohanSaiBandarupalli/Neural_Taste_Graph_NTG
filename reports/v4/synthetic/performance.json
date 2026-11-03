@@ -5,43 +5,44 @@
     "processor": "x86_64",
     "python": "3.11.18"
   },
-  "bundle_load_seconds": 0.751,
-  "bundle_size_mb": 171.0,
+  "bundle_load_seconds": 0.721,
+  "bundle_size_mb": 170.9,
   "single_request_latency_ms": {
-    "p50": 14.537582000002658,
-    "p95": 21.331294550054732,
-    "p99": 25.515005770080233,
+    "p50": 14.841925500149955,
+    "p95": 19.018142099685065,
+    "p99": 20.603825480648066,
     "n": 200
   },
   "single_request_with_explanations_ms": {
-    "p50": 20.411196500162987,
-    "p95": 24.865294399978662,
+    "p50": 18.53266350008198,
+    "p95": 19.986119949817294,
     "n": 50
   },
-  "batch_throughput_users_per_s": 158.3,
-  "peak_rss_mb": 2320.3,
+  "batch_throughput_users_per_s": 200.7,
+  "peak_rss_mb": 2344.8,
   "ann": {
     "n_items": 2979,
     "dim": 64,
     "n_queries": 500,
     "k": 100,
-    "flat_ms_per_query": 0.0117,
-    "hnsw_ms_per_query": 0.0201,
+    "flat_ms_per_query": 0.0122,
+    "hnsw_ms_per_query": 0.0149,
     "hnsw_recall@100": 0.9953200000000001,
     "note": "At this catalogue size exact search is already fast; HNSW matters at millions of items."
   },
   "note": "Measured in-process on the machine above; not a claim about production capacity.",
   "pipeline_timings_s": {
-    "prepare": 1.484,
-    "tune": 21.431,
-    "channels_fit_train": 190.147,
-    "ranker_train": 11.606,
-    "channels_fit_trainval": 185.612,
-    "benchmark": 72.49,
-    "tastetwin_eval": 1.462,
-    "journey": 42.229,
-    "serving_fit": 238.931,
-    "performance": 6.546
+    "prepare": 0.678,
+    "tune": 24.091,
+    "channels_fit_train": 1319.082,
+    "channels_fit_early": 276.184,
+    "ranker_train": 21.901,
+    "channels_fit_trainval": 171.359,
+    "benchmark": 68.125,
+    "tastetwin_eval": 1.427,
+    "journey": 40.103,
+    "serving_fit": 207.229,
+    "performance": 6.049
   },
-  "total_pipeline_s": 787.76
+  "total_pipeline_s": 2151.25
 }
