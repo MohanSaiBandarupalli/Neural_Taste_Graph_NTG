@@ -192,7 +192,9 @@ class Pipeline:
     def benchmark(self, d, wt, cs, ranker, params) -> dict:
         cfg = EvalConfig(ks=(10, 20), bootstrap=200 if self.quick else 500, max_users=2000 if self.quick else 5000, seed=self.seed)
         models = {}
-        for name in ["popularity", "itemknn", "ease", "rp3beta", "ials", "neumf", "content", "semantic", "sequential"]:
+        names = ["popularity", "itemknn", "ease", "rp3beta", "ials", "neumf", "content", "semantic", "sequential", "longtail"]
+        names += [n for n in ("sasrec", "twotower") if n in cs.models]
+        for name in names:
             m = cs.models.get(name) or MODEL_REGISTRY[name](**params.get(name, {})).fit(d, wt.fit)
             models[name] = (lambda u, k, m=m: m.recommend(u, k)[0], m.fit_seconds)
         models["hybrid_ltr"] = (lambda u, k: ranker.recommend(cs, u, k), None)
@@ -299,6 +301,34 @@ class Pipeline:
         (self.artifact_dir / "CURRENT").write_text(version)
         return version
 
+    @staticmethod
+    def _ann_benchmark(eng) -> dict | None:
+        """HNSW vs exact inner-product search over two-tower item vectors (recall@100, query latency)."""
+        tt = eng.cs.models.get("twotower")
+        if tt is None:
+            return None
+        from ntg.recsys.deep import ANNIndex
+
+        V = tt.item_vecs
+        rng = np.random.default_rng(0)
+        users = rng.choice(np.flatnonzero(eng.cs.tt.n_events >= 5), 500, replace=False)
+        Q = tt.user_vectors([(tt.seq_items[int(u)], tt.seq_ts[int(u)]) for u in users], float(tt.cutoff_ts))
+        out = {"n_items": int(V.shape[0]), "dim": int(V.shape[1]), "n_queries": int(len(Q)), "k": 100}
+        exact_ids = None
+        for kind in ("flat", "hnsw"):
+            idx = ANNIndex(V, kind)
+            t = time.perf_counter()
+            ids, _ = idx.search(Q, 100)
+            ms = (time.perf_counter() - t) * 1000 / len(Q)
+            if kind == "flat":
+                exact_ids = ids
+                out["flat_ms_per_query"] = round(ms, 4)
+            else:
+                out["hnsw_ms_per_query"] = round(ms, 4)
+                out["hnsw_recall@100"] = float(np.mean([len(set(a) & set(b)) / 100 for a, b in zip(exact_ids, ids)]))
+        out["note"] = "At this catalogue size exact search is already fast; HNSW matters at millions of items."
+        return out
+
     def performance(self, version: str) -> dict:
         from ntg.platform.engine import Engine
 
@@ -331,5 +361,6 @@ class Pipeline:
             "single_request_with_explanations_ms": {"p50": float(np.percentile(lat_e, 50)), "p95": float(np.percentile(lat_e, 95)), "n": len(lat_e)},
             "batch_throughput_users_per_s": round(len(users) / batch_s, 1),
             "peak_rss_mb": round(_rss_mb(), 1),
+            "ann": self._ann_benchmark(eng),
             "note": "Measured in-process on the machine above; not a claim about production capacity.",
         }
