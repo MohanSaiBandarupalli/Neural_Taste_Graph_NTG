@@ -14,7 +14,6 @@ import hashlib
 import json
 import pickle
 import platform
-import resource
 import subprocess
 import time
 from pathlib import Path
@@ -76,7 +75,13 @@ def _git_sha() -> str:
 
 
 def _rss_mb() -> float:
-    return resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024.0
+    """Peak resident memory in MB. `resource` is POSIX-only, so Windows reports NaN instead of crashing."""
+    try:
+        import resource
+    except ImportError:  # Windows
+        return float("nan")
+    peak = resource.getrusage(resource.RUSAGE_SELF).ru_maxrss
+    return peak / 1e6 if platform.system() == "Darwin" else peak / 1024.0  # macOS reports bytes, Linux KB
 
 
 class Pipeline:
