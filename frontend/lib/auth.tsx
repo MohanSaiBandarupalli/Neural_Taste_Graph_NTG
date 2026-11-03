@@ -10,19 +10,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [ready, setReady] = useState(false);
   const refresh = useCallback(async () => {
-    if (!auth.get()) { setUser(null); setReady(true); return; }
+    // The session lives in httpOnly cookies, so the only way to know who we are is to ask the API.
     try { setUser(await api<User>("/v1/me")); } catch { setUser(null); } finally { setReady(true); }
   }, []);
   useEffect(() => { refresh(); }, [refresh]);
   const login = async (email: string, password: string) => {
-    const r = await api<{ token: string; user: User }>("/v1/auth/login", { method: "POST", json: { email, password } });
-    auth.set(r.token); setUser(r.user); return r.user;
+    const r = await api<{ user: User }>("/v1/auth/login", { method: "POST", json: { email, password } });
+    setUser(r.user); return r.user;
   };
   const signup = async (b: any) => {
-    const r = await api<{ token: string; user: User }>("/v1/auth/signup", { method: "POST", json: b });
-    auth.set(r.token); setUser(r.user); return r.user;
+    const r = await api<{ user: User }>("/v1/auth/signup", { method: "POST", json: b });
+    setUser(r.user); return r.user;
   };
-  const logout = () => { auth.clear(); setUser(null); };
+  const logout = () => { api("/v1/auth/logout", { method: "POST" }).catch(() => {}); auth.clear(); setUser(null); };
   return <AuthCtx.Provider value={{ user, ready, login, signup, logout, refresh }}>{children}</AuthCtx.Provider>;
 }
 

@@ -24,7 +24,9 @@ class Settings:
     dataset: str = field(default_factory=lambda: _env("NTG_DATASET", "synthetic"))
     database_url: str = field(default_factory=lambda: _env("NTG_DATABASE_URL", "sqlite:///data/v4/ntg_app.db"))
     secret_key: str = field(default_factory=lambda: _env("NTG_SECRET_KEY", ""))
-    token_ttl_minutes: int = field(default_factory=lambda: int(_env("NTG_TOKEN_TTL_MINUTES", "720")))
+    token_ttl_minutes: int = field(default_factory=lambda: int(_env("NTG_TOKEN_TTL_MINUTES", "15")))
+    refresh_ttl_days: int = field(default_factory=lambda: int(_env("NTG_REFRESH_TTL_DAYS", "14")))
+    login_attempts_per_15min: int = field(default_factory=lambda: int(_env("NTG_LOGIN_ATTEMPTS_PER_15MIN", "10")))
     rate_limit_per_minute: int = field(default_factory=lambda: int(_env("NTG_RATE_LIMIT_PER_MINUTE", "240")))
     cors_origins: tuple[str, ...] = field(
         default_factory=lambda: tuple(

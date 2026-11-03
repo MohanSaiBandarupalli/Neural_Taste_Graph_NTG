@@ -11,6 +11,7 @@ admin       /v1/admin/*                         (JWT, role admin)
 """
 from __future__ import annotations
 
+import hmac
 import io
 import json
 import time
@@ -18,12 +19,12 @@ import uuid
 from collections import deque
 from contextlib import asynccontextmanager
 from dataclasses import asdict
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 
 import numpy as np
 import pandas as pd
-from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, UploadFile
+from fastapi import Depends, FastAPI, File, HTTPException, Query, Request, Response, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from pydantic import BaseModel, EmailStr, Field, field_validator
@@ -31,7 +32,18 @@ from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from ntg.api import db as m
-from ntg.api.security import RateLimiter, decode_token, hash_api_key, hash_password, issue_token, new_api_key, verify_password
+from ntg.api.security import (
+    decode_token,
+    hash_api_key,
+    hash_password,
+    hash_token,
+    issue_token,
+    make_rate_limiter,
+    new_api_key,
+    new_csrf_token,
+    new_refresh_token,
+    verify_password,
+)
 from ntg.core.config import Settings, get_settings
 from ntg.core.logging import get_logger
 from ntg.enterprise.analyst import BusinessAnalyst
@@ -46,6 +58,7 @@ from ntg.recsys.rerank import EXPLORATION_LEVELS
 log = get_logger("ntg.api")
 ROLES = ("viewer", "analyst", "admin")
 DEMO_PASSWORD = "demo-password-123"
+ACCESS_COOKIE, REFRESH_COOKIE, CSRF_COOKIE = "ntg_access", "ntg_refresh", "ntg_csrf"
 
 
 # ====================================================================== schemas
@@ -60,6 +73,10 @@ class SignupIn(BaseModel):
 class LoginIn(BaseModel):
     email: EmailStr
     password: str = Field(max_length=128)
+
+
+class RefreshIn(BaseModel):
+    refresh_token: str | None = Field(default=None, max_length=200)
 
 
 class ProfileIn(BaseModel):
@@ -167,7 +184,9 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
     secret = settings.resolved_secret()
     db_engine, SessionLocal = m.make_session_factory(settings.database_url)
     m.init_db(db_engine)
-    limiter = RateLimiter(settings.rate_limit_per_minute)
+    limiter = make_rate_limiter(settings.redis_url, settings.rate_limit_per_minute)
+    login_limiter = make_rate_limiter(settings.redis_url, settings.login_attempts_per_15min, 900, "ntg:login")
+    secure_cookies = settings.is_production
     latencies: deque = deque(maxlen=5000)
     state: dict = {}
 
@@ -191,14 +210,14 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
     app = FastAPI(title="NTG — Neural Taste Graph API", version="4.0.0", lifespan=lifespan,
                   description="Entertainment journey intelligence: recommendations, TasteTwin, discovery, enterprise analytics.")
     app.add_middleware(CORSMiddleware, allow_origins=list(settings.cors_origins), allow_credentials=True,
-                       allow_methods=["GET", "POST", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type", "X-API-Key"])
+                       allow_methods=["GET", "POST", "PATCH", "DELETE"], allow_headers=["Authorization", "Content-Type", "X-API-Key", "X-CSRF-Token"])
 
     @app.middleware("http")
     async def _mw(request: Request, call_next):
         rid = uuid.uuid4().hex[:12]
         t0 = time.perf_counter()
-        principal = request.headers.get("x-api-key", "")[:10] or (request.headers.get("authorization", "")[-16:]) or (
-            request.client.host if request.client else "anon")
+        principal = (request.headers.get("x-api-key", "")[:10] or request.headers.get("authorization", "")[-16:]
+                     or request.cookies.get(ACCESS_COOKIE, "")[-16:] or (request.client.host if request.client else "anon"))
         if request.url.path.startswith("/v1"):
             ok, retry = limiter.allow(principal)
             if not ok:
@@ -221,17 +240,45 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         return state["engine"]
 
     def current_user(request: Request, s: Session = Depends(get_db)) -> m.User:
+        """Bearer token (API clients) or httpOnly cookie (browser). Cookie auth on a state-changing
+        request must also present the CSRF double-submit header."""
         auth = request.headers.get("authorization", "")
-        if not auth.lower().startswith("bearer "):
-            raise HTTPException(401, "missing bearer token")
+        if auth.lower().startswith("bearer "):
+            token = auth[7:]
+        else:
+            token = request.cookies.get(ACCESS_COOKIE, "")
+            if not token:
+                raise HTTPException(401, "not authenticated")
+            if request.method not in ("GET", "HEAD", "OPTIONS"):
+                sent, expected = request.headers.get("x-csrf-token", ""), request.cookies.get(CSRF_COOKIE, "")
+                if not sent or not expected or not hmac.compare_digest(sent, expected):
+                    raise HTTPException(403, "CSRF token missing or invalid")
         try:
-            claims = decode_token(secret, auth[7:])
+            claims = decode_token(secret, token)
         except Exception:
             raise HTTPException(401, "invalid or expired token") from None
         u = s.get(m.User, int(claims["sub"]))
-        if u is None or u.org_id != claims.get("org"):
-            raise HTTPException(401, "unknown user")
+        if u is None or u.org_id != claims.get("org") or int(claims.get("sv", -1)) != u.session_version:
+            raise HTTPException(401, "session no longer valid")
         return u
+
+    def issue_session(response: Response, s: Session, u: m.User, family: str | None = None) -> dict:
+        access = issue_token(secret, u.id, u.org_id, u.role, settings.token_ttl_minutes, u.session_version)
+        raw, h = new_refresh_token()
+        s.add(m.RefreshToken(user_id=u.id, token_hash=h, family=family or uuid.uuid4().hex,
+                             expires_at=m.utcnow() + timedelta(days=settings.refresh_ttl_days)))
+        csrf = new_csrf_token()
+        common = {"secure": secure_cookies, "samesite": "lax", "path": "/"}
+        response.set_cookie(ACCESS_COOKIE, access, httponly=True, max_age=settings.token_ttl_minutes * 60, **common)
+        response.set_cookie(REFRESH_COOKIE, raw, httponly=True, max_age=settings.refresh_ttl_days * 86400, **common)
+        response.set_cookie(CSRF_COOKIE, csrf, httponly=False, max_age=settings.refresh_ttl_days * 86400, **common)
+        # The bearer token is also returned for non-browser API clients; browsers rely on the cookies.
+        return {"token": access, "refresh_token": raw, "csrf_token": csrf, "expires_in": settings.token_ttl_minutes * 60,
+                "user": _user_out(u)}
+
+    def clear_session(response: Response) -> None:
+        for c in (ACCESS_COOKIE, REFRESH_COOKIE, CSRF_COOKIE):
+            response.delete_cookie(c, path="/")
 
     def require(*roles):
         def dep(u: m.User = Depends(current_user)) -> m.User:
@@ -278,7 +325,7 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
                                 if d.get("is_synthetic") else "MovieLens data © GroupLens, used for research/demo purposes.")}
 
     @app.post("/v1/auth/signup", status_code=201)
-    def signup(body: SignupIn, s: Session = Depends(get_db)):
+    def signup(body: SignupIn, response: Response, s: Session = Depends(get_db)):
         if s.scalar(select(m.User).where(m.User.email == body.email.lower())):
             raise HTTPException(409, "email already registered")
         org = _consumer_org(s)
@@ -289,17 +336,69 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
         s.flush()
         s.add(m.Profile(org_id=org.id, user_id=u.id, name=u.display_name[:40] or "Me"))
         audit(s, u, "signup")
+        out = issue_session(response, s, u)
         s.commit()
-        return {"token": issue_token(secret, u.id, u.org_id, u.role, settings.token_ttl_minutes), "user": _user_out(u)}
+        return out
 
     @app.post("/v1/auth/login")
-    def login(body: LoginIn, s: Session = Depends(get_db)):
-        u = s.scalar(select(m.User).where(m.User.email == body.email.lower()))
+    def login(body: LoginIn, request: Request, response: Response, s: Session = Depends(get_db)):
+        email = body.email.lower()
+        ip = request.client.host if request.client else "?"
+        ok, retry = login_limiter.allow(f"{email}|{ip}")
+        if not ok:
+            raise HTTPException(429, "too many login attempts; try again later", headers={"Retry-After": str(retry)})
+        u = s.scalar(select(m.User).where(m.User.email == email))
         if u is None or not verify_password(body.password, u.password_hash):
+            audit(s, None, "login_failed", email[:3] + "***")
+            s.commit()
             raise HTTPException(401, "invalid credentials")
         audit(s, u, "login")
+        out = issue_session(response, s, u)
         s.commit()
-        return {"token": issue_token(secret, u.id, u.org_id, u.role, settings.token_ttl_minutes), "user": _user_out(u)}
+        return out
+
+    @app.post("/v1/auth/refresh")
+    def refresh(request: Request, response: Response, body: RefreshIn | None = None, s: Session = Depends(get_db)):
+        raw = (body.refresh_token if body and body.refresh_token else None) or request.cookies.get(REFRESH_COOKIE, "")
+        if not raw:
+            raise HTTPException(401, "missing refresh token")
+        rt = s.scalar(select(m.RefreshToken).where(m.RefreshToken.token_hash == hash_token(raw)))
+        if rt is None or rt.revoked or rt.expires_at < m.utcnow():
+            clear_session(response)
+            raise HTTPException(401, "refresh token invalid or expired")
+        if rt.replaced:
+            # reuse of a rotated token: treat as theft and revoke the whole family
+            for t in s.scalars(select(m.RefreshToken).where(m.RefreshToken.family == rt.family)):
+                t.revoked = True
+            audit(s, s.get(m.User, rt.user_id), "refresh_token_reuse_detected", rt.family[:8])
+            s.commit()
+            clear_session(response)
+            raise HTTPException(401, "refresh token reuse detected; please sign in again")
+        u = s.get(m.User, rt.user_id)
+        rt.replaced = True
+        out = issue_session(response, s, u, family=rt.family)
+        s.commit()
+        return out
+
+    @app.post("/v1/auth/logout", status_code=204)
+    def logout(request: Request, response: Response, s: Session = Depends(get_db)):
+        raw = request.cookies.get(REFRESH_COOKIE, "")
+        if raw:
+            rt = s.scalar(select(m.RefreshToken).where(m.RefreshToken.token_hash == hash_token(raw)))
+            if rt is not None:
+                for t in s.scalars(select(m.RefreshToken).where(m.RefreshToken.family == rt.family)):
+                    t.revoked = True
+                s.commit()
+        clear_session(response)
+
+    @app.post("/v1/auth/logout-all", status_code=204)
+    def logout_all(response: Response, u: m.User = Depends(current_user), s: Session = Depends(get_db)):
+        u.session_version += 1  # every outstanding access token stops validating
+        for t in s.scalars(select(m.RefreshToken).where(m.RefreshToken.user_id == u.id)):
+            t.revoked = True
+        audit(s, u, "logout_all")
+        s.commit()
+        clear_session(response)
 
     # ------------------------------------------------------------------ me / privacy
     @app.get("/v1/me")
@@ -329,12 +428,14 @@ def create_app(settings: Settings | None = None, engine: Engine | None = None) -
                              for p in profiles]}
 
     @app.delete("/v1/me", status_code=204)
-    def delete_me(u: m.User = Depends(current_user), s: Session = Depends(get_db), e: Engine = Depends(eng)):
+    def delete_me(response: Response, u: m.User = Depends(current_user), s: Session = Depends(get_db),
+                  e: Engine = Depends(eng)):
         for p in s.scalars(select(m.Profile).where(m.Profile.user_id == u.id)):
             e.forget_viewer(f"profile:{p.id}")
         audit(s, None, "account_deleted", f"user_id={u.id}")
         s.delete(u)
         s.commit()
+        clear_session(response)
 
     # ------------------------------------------------------------------ profiles
     @app.get("/v1/profiles")

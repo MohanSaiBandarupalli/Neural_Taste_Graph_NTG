@@ -8,7 +8,7 @@ test:               ## all tests (legacy + v4)
 	poetry run python -m pytest -q -W ignore
 
 lint:
-	poetry run ruff check src/ntg/core src/ntg/datasets src/ntg/recsys src/ntg/tastetwin src/ntg/intent src/ntg/discovery src/ntg/journey src/ntg/enterprise src/ntg/platform src/ntg/api src/ntg/pipelines/v4.py src/ntg/cli.py tests/v4 migrations
+	poetry run ruff check src/ntg/core src/ntg/datasets src/ntg/recsys src/ntg/tastetwin src/ntg/intent src/ntg/discovery src/ntg/journey src/ntg/enterprise src/ntg/platform src/ntg/api src/ntg/streaming src/ntg/pipelines/v4.py src/ntg/cli.py tests/v4 migrations
 	cd frontend && npm run typecheck
 
 build:              ## synthetic data -> tuned models -> reports/v4/synthetic -> artifacts/synthetic (~2-3 min)

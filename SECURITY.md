@@ -8,11 +8,16 @@ remains before a production launch.
 | Control | Implementation |
 |---|---|
 | Password storage | scrypt (N = 2¹⁴, r = 8, p = 1) with a 16-byte random salt per user; constant-time compare (`ntg/api/security.py`) |
-| Sessions | HS256 JWT with `exp`, `iat`, `iss` and the role. The secret comes from `NTG_SECRET_KEY`, and **startup fails in production if it is unset**. In development an ephemeral random key is used. |
+| Sessions (browser) | **httpOnly, SameSite=Lax cookies** (Secure in production): a 15-minute access JWT plus an opaque 14-day refresh token. JavaScript never sees either token. |
+| CSRF | Double-submit token: cookie-authenticated writes must send `X-CSRF-Token` matching the readable `ntg_csrf` cookie (constant-time compare). Bearer-token API clients are not exposed to CSRF and don't need it. |
+| Refresh tokens | Only SHA-256 hashes are stored. Each use **rotates** the token; replaying a rotated token is treated as theft and **revokes the whole token family**. |
+| Revocation | `POST /v1/auth/logout` revokes the refresh family and clears cookies. `POST /v1/auth/logout-all` bumps the user's `session_version`, so every outstanding access token stops validating immediately. |
+| Access tokens | HS256 JWT with `exp`, `iat`, `iss`, `jti`, role and session version. The secret comes from `NTG_SECRET_KEY`, and **startup fails in production if it is unset**. In development an ephemeral random key is used. |
 | API keys | `ntg_` plus 32 random bytes, shown once. Only the SHA-256 hash and a 10-character prefix are stored. Keys can be revoked, and last use is tracked. |
 | Authorisation | Roles viewer / analyst / admin, enforced per route. Every tenant row carries `org_id`, and every query filters on it. A viewer can reach only their own profiles. Unauthorised access returns 404, which does not reveal whether the resource exists. |
 | Input validation | Pydantic schemas with bounds (lengths, numeric ranges, enum patterns). CSV uploads are capped at 20 MB and validated without being stored. |
-| Rate limiting | Per-principal sliding window, returning 429 with `Retry-After`. It is in-process, so a multi-instance deployment needs Redis (see below). |
+| Rate limiting | Per-principal limit returning 429 with `Retry-After`. With `NTG_REDIS_URL` set, a Redis fixed window is **shared by all instances**; if Redis is unreachable it fails open to the per-process limiter (and reports `degraded`). |
+| Login brute force | A separate limit per email+IP (default 10 attempts per 15 minutes). Failed logins are audited with a masked email. |
 | Transport headers | `X-Content-Type-Options`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Cache-Control: no-store` on the API; the same set on the web app. CORS is an explicit allow-list. |
 | Secret hygiene | No secrets in source. `.env*` is git-ignored. Logs scrub `password` / `token` / `secret` / `api_key` / `authorization` values. |
 | Consent | `consent_personalization` (default on at signup, with an explicit checkbox). When it is off, recommendations use **no** history. `consent_analytics` defaults off. |
@@ -26,11 +31,9 @@ remains before a production launch.
 
 ## Known gaps (to do before production)
 
-1. **Token storage in the browser:** the demo keeps the JWT in `localStorage`. Production should use an
-   httpOnly, Secure, SameSite cookie set by the API, plus CSRF protection.
-2. **Distributed rate limiting and quotas** in Redis. Brute-force lockout and a login rate limit are not
-   yet separate from the global limit.
-3. **Refresh tokens and revocation** (a deny-list), plus password reset and email verification.
+1. **Password reset and email verification** (needs an email provider).
+2. **Per-plan quotas** on top of rate limits (the usage table exists; enforcement does not).
+3. **Account lockout notification** to the user after repeated failed logins.
 4. **SSO / SAML / OIDC** for enterprise tenants.
 5. **Pickle** is safe here only because the checksum and producer are trusted. Production should move to a
    signed artifact registry, or to non-executable formats (npz / LightGBM text).

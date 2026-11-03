@@ -1,0 +1,10 @@
+{
+ "evidence_type": "observed",
+ "events": 421127,
+ "viewers": 7956,
+ "partitions": 4,
+ "produce_events_per_s": 36706,
+ "consume_events_per_s": 21941,
+ "consumer": "single process, partitions consumed sequentially; SQLite WAL state store, offset+state committed per batch of 2000",
+ "note": "Local stand-ins for Kafka and an online KV store; one 4-vCPU container."
+}

@@ -45,8 +45,24 @@ pytest-cov = "^6.0.0"
 httpx = ">=0.27"
 ruff = ">=0.6"
 
+[tool.poetry.group.postgres]
+optional = true
+
 [tool.poetry.group.postgres.dependencies]
 psycopg = {version = ">=3.2", extras = ["binary"]}
+
+[tool.poetry.group.deep]
+optional = true  # PyTorch + faiss (~5 GB with CUDA runtime): poetry install --with deep
+
+[tool.poetry.group.deep.dependencies]
+torch = ">=2.4"
+faiss-cpu = ">=1.8"
+
+[tool.poetry.group.redis]
+optional = true  # shared rate limiting across instances (NTG_REDIS_URL)
+
+[tool.poetry.group.redis.dependencies]
+redis = ">=5.0"
 
 [build-system]
 requires = ["poetry-core>=2.0.0,<3.0.0"]

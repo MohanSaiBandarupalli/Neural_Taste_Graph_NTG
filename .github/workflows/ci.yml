@@ -24,7 +24,7 @@ jobs:
       - name: Lint (v4 code)
         run: >
           poetry run ruff check src/ntg/core src/ntg/datasets src/ntg/recsys src/ntg/tastetwin src/ntg/intent
-          src/ntg/discovery src/ntg/journey src/ntg/enterprise src/ntg/platform src/ntg/api
+          src/ntg/discovery src/ntg/journey src/ntg/enterprise src/ntg/platform src/ntg/api src/ntg/streaming
           src/ntg/pipelines/v4.py src/ntg/cli.py tests/v4 migrations
       - name: Tests (unit + v4; v4 builds a tiny synthetic bundle, no download needed)
         run: poetry run python -m pytest -q -W ignore

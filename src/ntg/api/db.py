@@ -43,6 +43,8 @@ class User(Base):
     role: Mapped[str] = mapped_column(String(16), default="viewer")  # viewer | analyst | admin
     consent_personalization: Mapped[bool] = mapped_column(Boolean, default=True)
     consent_analytics: Mapped[bool] = mapped_column(Boolean, default=False)
+    # Incremented by "log out everywhere"; access tokens carry it, so older tokens stop working.
+    session_version: Mapped[int] = mapped_column(Integer, default=0, server_default="0")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
     profiles: Mapped[list["Profile"]] = relationship(back_populates="user", cascade="all, delete-orphan")
 
@@ -71,6 +73,21 @@ class Event(Base):
     rating: Mapped[float | None] = mapped_column(Float, nullable=True)
     ts: Mapped[int] = mapped_column(Integer)
     profile: Mapped[Profile] = relationship(back_populates="events")
+
+
+class RefreshToken(Base):
+    """Opaque refresh tokens: only a SHA-256 hash is stored. Rotated on every use; a reused
+    (already-rotated) token revokes its whole family, which detects token theft."""
+
+    __tablename__ = "refresh_tokens"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id", ondelete="CASCADE"), index=True)
+    token_hash: Mapped[str] = mapped_column(String(128), unique=True, index=True)
+    family: Mapped[str] = mapped_column(String(64), index=True)
+    expires_at: Mapped[datetime] = mapped_column(DateTime)
+    revoked: Mapped[bool] = mapped_column(Boolean, default=False)
+    replaced: Mapped[bool] = mapped_column(Boolean, default=False)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=utcnow)
 
 
 class ApiKey(Base):

@@ -24,10 +24,13 @@ import pandas as pd
 import scipy.sparse as sp
 
 from ntg.datasets.matrix import InteractionData
-from ntg.recsys.models import MODEL_REGISTRY, Recommender, topk_rows
+from ntg.recsys.models import MODEL_REGISTRY, Recommender, deep_available, topk_rows
 from ntg.tastetwin.model import TasteTwin
 
-DEFAULT_CHANNELS = ("ease", "rp3beta", "itemknn", "ials", "sequential", "content", "semantic", "popularity")
+BASE_CHANNELS = ("ease", "rp3beta", "itemknn", "ials", "sequential", "content", "semantic", "popularity", "longtail")
+DEEP_CHANNELS = ("sasrec", "twotower")
+# Deep channels join automatically when the optional `deep` group (PyTorch) is installed.
+DEFAULT_CHANNELS = BASE_CHANNELS + (DEEP_CHANNELS if deep_available() else ())
 
 
 @dataclass

@@ -7,7 +7,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends libgomp1 && rm 
 WORKDIR /app
 RUN pip install --no-cache-dir "poetry==2.0.0"
 COPY pyproject.toml poetry.lock /app/
-RUN poetry install --only main --with postgres --no-root --no-ansi
+RUN poetry install --only main --with postgres,redis --no-root --no-ansi
 
 FROM base AS runtime
 COPY README.md LICENSE /app/

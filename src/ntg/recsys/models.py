@@ -509,6 +509,41 @@ class SequentialMarkov(Recommender):
         return np.asarray((sp.csr_matrix(x) @ self.T).todense(), dtype=np.float32).ravel()
 
 
+@dataclass
+class LongTail(ContentTFIDF):
+    """Long-tail retrieval: content similarity to the viewer, restricted to titles OUTSIDE the
+    popularity head (top ``head_frac`` of fit-window interactions), boosted by a Bayesian-smoothed
+    rating prior so 'less known' never means 'low quality'. Head titles are pushed to the bottom
+    (finite penalty, so ranks stay defined). Feeds the exploratory discovery modes.
+    """
+
+    name: str = "longtail"
+    head_frac: float = 0.2
+    prior_m: float = 20.0
+    quality_weight: float = 0.3
+
+    def _fit(self, data, fit_df):
+        super()._fit(data, fit_df)
+        pop = np.bincount(fit_df["i"].to_numpy(), minlength=data.n_items).astype(np.float64)
+        nz = pop[pop > 0]
+        cut = np.quantile(nz, 1 - self.head_frac) if len(nz) else np.inf
+        self.head = pop >= cut
+        sums = np.bincount(fit_df["i"].to_numpy(), weights=fit_df["rating"].to_numpy(), minlength=data.n_items)
+        mu = float(fit_df["rating"].mean()) if len(fit_df) else 3.5
+        bayes = (sums + self.prior_m * mu) / (pop + self.prior_m)
+        self.quality = ((bayes - bayes.mean()) / (bayes.std() + 1e-9)).astype(np.float32)
+
+    def _adjust(self, s: np.ndarray) -> np.ndarray:
+        s = s + self.quality_weight * self.quality
+        return np.where(self.head, s - 10.0, s).astype(np.float32)
+
+    def score(self, users):
+        return self._adjust(super().score(users))
+
+    def score_history(self, h):
+        return self._adjust(super().score_history(h))
+
+
 MODEL_REGISTRY = {
     "popularity": Popularity,
     "itemknn": ItemKNN,
@@ -519,4 +554,28 @@ MODEL_REGISTRY = {
     "content": ContentTFIDF,
     "semantic": SemanticLSA,
     "sequential": SequentialMarkov,
+    "longtail": LongTail,
 }
+
+
+def deep_available() -> bool:
+    """True when the optional `deep` group (PyTorch) is installed."""
+    import importlib.util
+
+    return importlib.util.find_spec("torch") is not None
+
+
+def _sasrec(**kw):
+    from ntg.recsys.deep import SASRec  # lazy: avoids a circular import and keeps torch optional
+
+    return SASRec(**kw)
+
+
+def _twotower(**kw):
+    from ntg.recsys.deep import TwoTower
+
+    return TwoTower(**kw)
+
+
+MODEL_REGISTRY["sasrec"] = _sasrec
+MODEL_REGISTRY["twotower"] = _twotower

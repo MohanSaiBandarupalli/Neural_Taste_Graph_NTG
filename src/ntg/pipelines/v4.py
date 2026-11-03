@@ -132,7 +132,10 @@ class Pipeline:
 
         tuning = self._timed("tune", self.tune, d)
         _write(self.report_dir / "tuning.json", tuning)
-        params = tuning["selected"]
+        params = dict(tuning["selected"])
+        if self.quick:  # CI / smoke runs: bounded deep-model training (no effect without the deep group)
+            params.setdefault("sasrec", {"max_epochs": 3, "patience": 1})
+            params.setdefault("twotower", {"max_epochs": 3, "patience": 1})
 
         # ---------------- ranker training on VAL labels (channels fit on TRAIN)
         wv = d.window("val")
