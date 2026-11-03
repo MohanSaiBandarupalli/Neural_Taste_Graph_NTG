@@ -96,8 +96,17 @@ Key design decisions:
   counts.
 * **Frontend:** Next.js 14 app router with client components calling `/api/*`, which is rewritten to the
   API at build time. Dark design tokens; charts use a CVD-validated categorical palette.
-* **Deliberately not used:** Kafka, Kubernetes, Redis, a vector database. Nothing in the current workload
-  needs them. The catalogue fits in memory, and exact dense scoring over 3k items takes milliseconds.
+* **Deep models (v5, optional):** SASRec and an inductive two-tower retriever join the channel set when
+  PyTorch is installed. A faiss HNSW index over the two-tower item vectors is built and benchmarked (recall@100
+  0.995 vs exact).
+* **Streaming slice (v5, implemented):** `ntg.streaming` is a partitioned append-only event log, per-partition
+  consumers applying order-independent TasteTwin updates, and a state store that commits state and offset
+  in one transaction with event-id deduplication. Local stand-ins: JSONL for Kafka, SQLite for an online KV
+  store. Tested to equal the batch state under shuffling, duplicates and a crash.
+* **Sessions (v5):** httpOnly cookies, CSRF double-submit, rotating refresh tokens with reuse detection,
+  and Redis-shared rate limiting when `NTG_REDIS_URL` is set.
+* **Deliberately not used:** Kafka, Kubernetes and a hosted vector database. The local stand-ins implement
+  the same contracts at this scale.
 
 ## 6. Scale-out design (NOT implemented; design targets, not claims)
 
@@ -137,4 +146,6 @@ What changes and why:
 6. **Latency budget** (target, unmeasured): gateway 5 ms, candidates 15 ms, features 10 ms, ranking 20 ms,
    re-ranking 5 ms, which gives p99 under 100 ms.
 
-None of §6 has been built or load-tested. The only measured numbers are in PERFORMANCE_REPORT.md.
+Status of §6: the **streaming TasteTwin path** (2 above) and **ANN retrieval** (1) are implemented and
+tested as local slices (see §5). The rest (feature store, multi-region, sharded serving) is design only and
+has not been load-tested. The only measured numbers are in PERFORMANCE_REPORT.md.

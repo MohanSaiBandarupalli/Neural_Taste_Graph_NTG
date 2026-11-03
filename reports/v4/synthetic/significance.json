@@ -1,0 +1,52 @@
+{
+ "evidence_type": "observed",
+ "dataset": "synthetic",
+ "n_users": 1129,
+ "metric": "ndcg@10",
+ "method": "paired bootstrap over users (5000 resamples); two-sided p = 2*min(P(diff<=0), P(diff>=0))",
+ "mean": {
+  "hybrid_ltr": 0.14946265378693657,
+  "twotower": 0.14863083449354278,
+  "rp3beta": 0.13875347848784259,
+  "ease": 0.13793574770033004,
+  "popularity": 0.07740026646886757
+ },
+ "comparisons": {
+  "hybrid_ltr - twotower": {
+   "mean_diff": 0.0008318192933937672,
+   "relative": 0.005596545940337201,
+   "ci95": [
+    -0.004131363696374161,
+    0.00563018290409513
+   ],
+   "p_value": 0.7312
+  },
+  "hybrid_ltr - rp3beta": {
+   "mean_diff": 0.010709175299093964,
+   "relative": 0.07718131044932534,
+   "ci95": [
+    0.005229005845485645,
+    0.016433171119938386
+   ],
+   "p_value": 0.0
+  },
+  "hybrid_ltr - ease": {
+   "mean_diff": 0.0115269060866065,
+   "relative": 0.08356721356706663,
+   "ci95": [
+    0.006337110027352041,
+    0.016895663723041493
+   ],
+   "p_value": 0.0
+  },
+  "hybrid_ltr - popularity": {
+   "mean_diff": 0.072062387318069,
+   "relative": 0.9310353905183827,
+   "ci95": [
+    0.06352934875221654,
+    0.0808779306138248
+   ],
+   "p_value": 0.0
+  }
+ }
+}

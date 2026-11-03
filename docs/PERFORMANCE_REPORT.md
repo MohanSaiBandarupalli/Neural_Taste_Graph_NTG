@@ -6,7 +6,30 @@ Sources: `reports/v4/synthetic/performance.json` and `api_load_test.json`. These
 **say nothing about production capacity at scale**. See ARCHITECTURE §6 for the scale-out design, which is
 not implemented.
 
-## Pipeline (`ntg build`, full grids): 136.9 s total
+## v5 update (11 channels incl. SASRec + two-tower, two-window ranker)
+
+| Measure | v4 | v5 |
+|---|---|---|
+| Engine, one request, no explanations | p50 7.4 ms, p95 8.3 ms | p50 **14.8 ms**, p95 19.0 ms, p99 20.6 ms |
+| Engine, one request, with explanations | p50 10.2 ms | p50 18.5 ms, p95 20.0 ms |
+| Engine batch scoring | 282 users/s | 201 users/s |
+| Bundle size / load | 137 MB / 0.40 s | 171 MB / 0.72 s |
+| Peak RSS during build | 1.2 GB | 2.3 GB |
+| Full pipeline | 2.3 min | 13.1 min measured for the single-window v5 run; the two-window pipeline adds one channel fit (~3–4 min), so **~16–17 min uncontended (estimate)**. Its measured run took 36 min because the test suite ran on the same 4 CPUs. |
+
+Latency doubled because every request now runs a transformer forward pass (SASRec) and a two-tower user
+encoding. That is the price of the +7.7% NDCG gain. The obvious next optimisation is to precompute and
+cache user vectors for known viewers, refreshed by the streaming consumer, so only new events trigger an
+encode. Training cost: SASRec about 130 s and two-tower about 35 s per fit on CPU; each is fit four
+times per build.
+
+Streaming TasteTwin (`streaming.json`): 21,941 events/s consumed and 36,706 events/s produced, on one
+process.
+
+ANN (`performance.json` → `ann`): HNSW recall@100 0.995 vs exact; 0.015 ms per query (exact 0.012 ms at
+3k titles).
+
+## v4 pipeline (`ntg build`, full grids): 136.9 s total
 
 | Stage | Seconds | Peak RSS |
 |---|---|---|

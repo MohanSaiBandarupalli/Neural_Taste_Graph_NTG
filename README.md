@@ -18,16 +18,18 @@ backend, a consumer app and an enterprise analytics app.
 | Area | What works (tested) | Where |
 |---|---|---|
 | Data | MovieLens-schema ingest (DuckDB), **global temporal split** with a hard leakage contract, synthetic generator with ground truth | `ntg/datasets` |
-| Retrieval | Popularity, ItemKNN, EASE, RP3β graph walk, iALS, NeuMF (NumPy, BPR), content TF-IDF, LSA semantic, sequential Markov | `ntg/recsys/models.py` |
-| Ranking | 8-channel candidate union → LightGBM LambdaMART on 38 features (channel scores/ranks, TasteTwin, fatigue, franchise) | `ntg/recsys/hybrid.py` |
-| Re-ranking | familiar / balanced / exploratory / unexpected; MMR diversity; franchise and genre caps; relevance floor | `ntg/recsys/rerank.py` |
+| Retrieval | Popularity, ItemKNN, EASE, RP3β graph walk, iALS, NeuMF (NumPy, BPR), content TF-IDF, LSA semantic, sequential Markov, long-tail | `ntg/recsys/models.py` |
+| **Deep models** (PyTorch, optional) | **SASRec** (causal transformer, full-softmax CE) and an **inductive two-tower** retriever (logQ-corrected in-batch softmax) with a **faiss HNSW** ANN index | `ntg/recsys/deep.py` |
+| Ranking | 11-channel candidate union → LightGBM LambdaMART on 47 features, trained on **two time windows** | `ntg/recsys/hybrid.py` |
+| Re-ranking | familiar / balanced / exploratory / unexpected; MMR diversity; franchise and genre caps; relevance floor; long-tail quota | `ntg/recsys/rerank.py` |
 | Explanations | item-kNN anchors, TasteTwin match, emerging interest, hidden interest, TreeSHAP ranking drivers; no generated text | `ntg/recsys/explain.py` |
 | **TasteTwin** | decayed long-term and short-term state with an O(1) online update; momentum, stability, exploration, Beta uncertainty, evolution | `ntg/tastetwin` |
+| **Streaming** | partitioned event log → idempotent consumer → state store; order-independent updates, state + offset in one transaction, event-id dedup (~22k events/s) | `ntg/streaming` |
 | Intent | NL request → explicit constraints; unsupported asks (runtime, series, language) are surfaced, not ignored | `ntg/intent` |
 | Discovery | hidden interests (with evidence), fatigue risk (labelled without using inactivity) | `ntg/discovery` |
 | **Journey Orchestrator** | multi-session simulator with explicit assumptions, 6 policies, adaptive fatigue-aware policy, sensitivity sweeps, IPS/SNIPS OPE | `ntg/journey` |
 | Enterprise | engagement-risk proxy (out-of-time, calibrated), segments, content intelligence, business scenario simulator, grounded AI analyst | `ntg/enterprise` |
-| Platform | FastAPI `/v1`: JWT + scrypt, RBAC, tenant isolation, API keys, rate limit, consent, export/delete, audit, usage | `ntg/api` |
+| Platform | FastAPI `/v1`: httpOnly-cookie sessions + CSRF, rotating refresh tokens with reuse detection, logout-everywhere, scrypt, RBAC, tenant isolation, API keys, Redis-shared rate limit, login brute-force limit, consent, export/delete, audit, usage | `ntg/api` |
 | Apps | Next.js consumer app (12 pages) and enterprise app (15 pages), all wired to the API | `frontend/` |
 | Ops | Docker (API and web, both built and run), compose, Alembic, CI, versioned model bundles with SHA-256 manifest | root |
 
@@ -38,20 +40,25 @@ Hyper-parameters are selected on validation and reported on test. 95% bootstrap 
 
 | Result | Value | Honest reading |
 |---|---|---|
-| Hybrid LTR, warm users, NDCG@10 | **0.1397** [0.131, 0.149] vs popularity 0.0774 | Ties the best single models (RP3β 0.1388, EASE 0.1379). CIs overlap. |
-| Hybrid LTR, cold-start users (1–4 events) | **0.128** vs best single 0.100 (iALS) | Largest gain, but n = 79, so CIs overlap. |
-| "Balanced" re-ranking | franchise-duplicate lists 31.8% → **0%**, diversity +19% | Costs 4.8% NDCG. |
+| **Hybrid LTR, warm users (n = 1,129), NDCG@10** | **0.1495** [0.140, 0.159] | **+7.7% vs the best classical model (RP3β), paired bootstrap p < 0.001.** Ties the two-tower model alone (+0.6%, p = 0.73). |
+| Two-tower (deep) alone | 0.1486 | New best single model. The hybrid's gain over classical CF comes from it. |
+| SASRec (transformer) | 0.0710 | Weak here: the synthetic data has almost no sequence signal. Needs real data to judge. |
+| Hybrid LTR, cold-start users (1–4 events) | **0.1215** vs 0.1066 (two-tower) | Best for new users, but n = 79 and CIs overlap. |
+| "Balanced" re-ranking | franchise-duplicate lists 33% → **0%** | Costs 4.5% NDCG. |
+| "Exploratory" mode | long-tail share **26.4%** (was 0.2%), coverage 21% | Costs 24% NDCG vs familiar: a deliberate, measured trade-off. |
 | TasteTwin vs static profile (next-period genre mix) | JS divergence −0.0041 [−0.0027, −0.0056] | Small but significant. Gain comes from time decay. |
 | Engagement-risk proxy (out-of-time) | AUC 0.80, ECE 0.036 | Recency alone gets 0.79. It is a proxy, not churn. |
 | Fatigue model | AUC 0.627 | Does **not** beat its one-signal baseline (0.634). |
 | Hidden interests | hit@3 0.59 | Below the popular-genre baseline (0.64). The synthetic drift is random, so nothing personal is learnable. |
-| Journey Orchestrator (simulated) | +1.89 satisfaction/journey [1.18, 2.51] vs strong baseline | Holds only when viewers fatigue. At zero fatigue it ties (−0.12 [−0.80, 0.63]). |
-| Serving latency (engine, 1 request) | p50 7.4 ms, p95 8.3 ms; with explanations 10.2 ms | Measured on one 4-vCPU container. |
+| Journey Orchestrator (simulated) | +1.89 satisfaction/journey [1.18, 2.51] vs strong baseline | Holds only when viewers fatigue. At zero fatigue it ties. |
+| Serving latency (engine, 1 request, 11 channels) | p50 14.8 ms, p95 19.0 ms; with explanations 18.5 ms | Doubled from v4 (7.4 ms) by the transformer and two-tower passes. One 4-vCPU container. |
+| ANN retrieval (HNSW vs exact) | recall@100 0.995 | Exact search is still fast at 3k titles; HNSW is what scales. |
 
 ## Quick start
 
 ```bash
 make install            # poetry + npm
+poetry install --with deep   # optional: PyTorch + faiss (~5 GB) for SASRec / two-tower; skipped automatically if absent
 make build              # synthetic data -> tuned models -> reports/v4/synthetic -> artifacts/synthetic (~2.5 min)
 make api                # http://127.0.0.1:8000/docs
 make web                # http://localhost:3000
@@ -62,9 +69,9 @@ Local demo accounts are seeded only when `NTG_ENV` is not production: `viewer@de
 
 Docker: `docker compose --profile build run --rm build-models && docker compose up -d api web`.
 
-Real MovieLens 32M: unzip it to `data/external/movielens/ml-32m/`, then run `make build-ml32m`. That uses a
-deterministic 10% user sample and items with at least 20 training events, so the dense item-item models fit
-in laptop memory.
+Real MovieLens 32M: unzip it to `data/external/movielens/ml-32m/`, then run `python scripts/run_ml32m.py`.
+It checks the files, runs the full benchmark on a deterministic 10% user sample, and prints the headline
+table. Share `reports/v4/ml-32m/` to have the documentation updated with real results.
 
 ## Repository map
 

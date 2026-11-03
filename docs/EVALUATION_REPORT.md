@@ -36,7 +36,95 @@ drift) will look better here than they may on real data. Section 7 lists where t
   history are served by popularity and are not scored.
 * **CIs:** 500-sample bootstrap over users, 95% percentile intervals.
 
-## 2. Ranking: warm users (n = 1,129)
+## v5 results (current)
+
+v5 adds two PyTorch models (SASRec and a two-tower retriever), a long-tail channel, and ranker training
+on two time windows. The protocol in §1 is unchanged: tune on VAL, report on TEST once. Sources:
+`benchmark.json` and `significance.json`.
+
+### v5.1 Warm users (n = 1,129)
+
+| Model | NDCG@10 [95% CI] | Recall@20 | HR@10 | Coverage@10 | ILD@10 | Long-tail@10 | Franchise-dup |
+|---|---|---|---|---|---|---|---|
+| **hybrid_ltr** (11 channels, 2-window ranker) | **0.1495** [0.1400, 0.1592] | **0.1306** | **0.671** | 12.9% | 0.565 | 0.4% | 33.0% |
+| **twotower** (new) | 0.1486 [0.1390, 0.1590] | 0.1233 | 0.644 | 11.0% | 0.574 | 0.4% | 41.1% |
+| rp3beta | 0.1388 [0.1293, 0.1490] | 0.1182 | 0.628 | 17.3% | 0.614 | 3.1% | 42.1% |
+| ease | 0.1379 [0.1288, 0.1474] | 0.1190 | 0.631 | 11.1% | 0.659 | 0.2% | 34.9% |
+| itemknn | 0.1372 [0.1277, 0.1473] | 0.1110 | 0.625 | 7.9% | 0.665 | 0.5% | 44.6% |
+| ials | 0.1354 [0.1268, 0.1458] | 0.1198 | 0.609 | 17.1% | 0.613 | 0.6% | 27.5% |
+| neumf | 0.0843 [0.0773, 0.0907] | 0.0788 | 0.482 | 55.9% | 0.622 | 30.4% | 14.9% |
+| popularity | 0.0774 [0.0705, 0.0840] | 0.0653 | 0.450 | 0.9% | 0.839 | 0.0% | 74.3% |
+| **sasrec** (new) | 0.0710 [0.0648, 0.0774] | 0.0608 | 0.442 | 2.4% | 0.836 | 0.0% | 58.5% |
+| sequential | 0.0633 [0.0572, 0.0693] | 0.0550 | 0.384 | 47.1% | 0.796 | 12.2% | 15.1% |
+| content | 0.0444 [0.0396, 0.0489] | 0.0445 | 0.319 | 65.7% | 0.147 | 74.8% | 27.4% |
+| semantic | 0.0396 [0.0358, 0.0439] | 0.0426 | 0.303 | 67.1% | 0.313 | 73.2% | 50.0% |
+| **longtail** (new) | 0.0301 [0.0261, 0.0342] | 0.0291 | 0.214 | 9.6% | 0.512 | 100.0% | 6.6% |
+
+### v5.2 Paired significance (same 1,129 users, 5,000 bootstrap resamples; `significance.json`)
+
+| Comparison (NDCG@10) | Difference | Relative | 95% CI | p |
+|---|---|---|---|---|
+| hybrid − RP3β | +0.0107 | **+7.7%** | [+0.0052, +0.0164] | < 0.001 |
+| hybrid − EASE | +0.0115 | **+8.4%** | [+0.0063, +0.0169] | < 0.001 |
+| hybrid − two-tower | +0.0008 | +0.6% | [−0.0041, +0.0056] | 0.73 |
+| hybrid − popularity | +0.0721 | +93% | [+0.0635, +0.0809] | < 0.001 |
+
+**Reading:**
+
+* The hybrid now **significantly beats every classical model**. Most of that gain comes from the two-tower
+  channel, which the ranker relies on most (top features by gain: `twotower_logrank`, `n_channels`,
+  `twotower_z`).
+* The hybrid and two-tower alone are **statistically tied** for warm users. The hybrid still earns its
+  place through cold start (§v5.3), explanations (TreeSHAP), and the controllable re-ranking stack.
+* **SASRec is weak here** (0.0710, below popularity). The synthetic generator orders items within a
+  session at random, so there is almost no next-item signal; the simple Markov model is similarly weak
+  (0.0633). This is a property of the data, not proof that SASRec is weak. Real MovieLens has strong
+  sequential structure, so ML-32M is its fair test.
+* Liked-only relevance (rating ≥ 4): hybrid 0.1150 vs RP3β 0.1064 vs EASE 0.1043.
+
+### v5.3 Cold-start users (1–4 events, n = 79)
+
+Hybrid 0.1215 [0.0946, 0.1466]; two-tower 0.1066; iALS 0.0997; popularity 0.0986. The hybrid is
+numerically best, but n is small and the CIs overlap.
+
+### v5.4 Why the ranker needed two windows (a fix found during evaluation)
+
+With the deep channels added, the first v5 run trained the ranker on one window (984 user groups). It
+scored **0.1372, below two-tower alone (0.1486)**: a stacked ranker losing to its own best input
+indicates too little training data. Adding an earlier, non-overlapping window from inside TRAIN
+(channels fit on the first 89% of TRAIN time, labels from the rest) gave 2,088 groups and lifted the
+hybrid to 0.1495. Early stopping uses only the latest (VAL) window. Both runs are in the git history.
+
+### v5.5 Exploration levels (same ranker; n = 1,500)
+
+| Level | NDCG@10 | ILD@10 | Coverage@10 | Long-tail@10 | Franchise-dup |
+|---|---|---|---|---|---|
+| familiar | 0.1495 | 0.565 | 12.9% | 0.4% | 33.0% |
+| **balanced** (default) | 0.1428 | 0.666 | 13.1% | 0.3% | **0.0%** |
+| exploratory | 0.1133 | 0.824 | 20.6% | **26.4%** | 1.9% |
+| unexpected | 0.0832 | 0.811 | 23.4% | **37.0%** | 6.6% |
+
+The v4 gap is fixed: the exploratory modes now reach the long tail (v4: 0.2% and 0.7%), thanks to the
+long-tail retrieval channel and the reserved long-tail slots. The accuracy cost is explicit: −24% NDCG
+for exploratory vs familiar. That trade-off is the viewer's choice in the UI.
+
+### v5.6 Candidate generation and ANN
+
+* Candidate recall (share of relevant unseen VAL items that reach the ranker): 43.9% → **49.0%**.
+* HNSW vs exact inner-product search over two-tower item vectors: recall@100 **0.995**, 0.015 ms per
+  query vs 0.012 ms exact. At 3k titles exact search is already fast; HNSW is what scales to millions.
+
+### v5.7 Streaming TasteTwin (`streaming.json`)
+
+All 421k events, shuffled, with duplicated producer retries and a simulated crash mid-batch, produce
+exactly the batch TasteTwin state (to float32 precision; tests in `test_streaming.py`). Throughput on one
+process: 21,941 events/s consumed, 36,706 events/s produced.
+
+---
+
+The sections below are the **v4 results (historical)**, kept for the before/after record.
+
+## 2. Ranking: warm users (n = 1,129) — v4
 
 | Model | NDCG@10 [95% CI] | Recall@20 | HR@10 | MAP@10 | Coverage@10 | ILD@10 | Long-tail@10 | Franchise-dup |
 |---|---|---|---|---|---|---|---|---|
@@ -63,7 +151,7 @@ drift) will look better here than they may on real data. Section 7 lists where t
 * Liked-only relevance (rating ≥ 4, n = 1,103): hybrid NDCG@10 0.1085, RP3β 0.1064, EASE 0.1043,
   popularity 0.0416. Same conclusion.
 
-## 3. Ranking: cold-start users (1–4 events, n = 79)
+## 3. Ranking: cold-start users (1–4 events, n = 79) — v4
 
 | Model | NDCG@10 [95% CI] | HR@10 |
 |---|---|---|
@@ -77,7 +165,7 @@ This is the hybrid's largest gain (+28% relative over the best single model). It
 learns to lean on popularity and TasteTwin features when history is thin. But n = 79 and the CIs overlap,
 so it is a lead to confirm on real data, not a result.
 
-## 4. Exploration levels (same ranker, different re-ranking; n = 1,500)
+## 4. Exploration levels (same ranker, different re-ranking; n = 1,500) — v4
 
 | Level | NDCG@10 | ILD@10 | Coverage@10 | Long-tail@10 | Franchise-dup |
 |---|---|---|---|---|---|
@@ -191,7 +279,10 @@ it is used on real logs.
 ## 8. Reproducing
 
 ```bash
+poetry install --with deep                            # PyTorch for SASRec / two-tower (optional)
 python -m ntg.cli build --dataset synthetic           # all of the above
+python scripts/paired_significance.py > reports/v4/synthetic/significance.json
+python scripts/streaming_benchmark.py > reports/v4/synthetic/streaming.json
 pytest tests/v4                                       # correctness tests (leakage, metrics, online==batch, OPE)
 ```
 

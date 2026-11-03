@@ -28,17 +28,20 @@ users or systems.
 | Content TF-IDF | cold items, long tail | genres, tags, decade | profile cosine | bundle |
 | Semantic LSA | NL search and a channel | TF-IDF → 48-d SVD | cosine | bundle |
 | Sequential | short-term intent | lag-1..3 transitions within 60 days | last-5 items · T | bundle |
-| Hybrid ranker | final ranking | LightGBM LambdaMART on 38 features; VAL labels; early stopping | TreeSHAP for explanations | bundle |
+| Long-tail | discovery beyond the popularity head | content similarity + Bayesian quality prior, head titles excluded | profile cosine | bundle |
+| **SASRec** (PyTorch) | sequential next-item intent | causal transformer (2 layers, 64-d, last 50 items), full softmax CE, early stop on leave-last-out inside the fit window | one forward pass per viewer | bundle (weights) |
+| **Two-tower** (PyTorch) | strongest single retriever; works for brand-new viewers | inductive user tower over recency-weighted history; item tower = ID + genre/tag/decade features; in-batch softmax with logQ correction | user vector · item matrix, or faiss HNSW | bundle (weights) |
+| Hybrid ranker | final ranking | LightGBM LambdaMART on 47 features (11 channels × score/log-rank/z + 14 context features); trained on two time windows; early stopping on VAL | TreeSHAP for explanations | bundle |
 | TasteTwin | dynamic viewer state | decayed sufficient statistics | O(1) online update | bundle |
 | Fatigue model | fatigue risk and its drivers | logistic, 7 standardised signals | per viewer | bundle |
 | Engagement-risk proxy | disengagement risk | isotonic-calibrated HistGBM (plus logistic for explanations) | per viewer | bundle |
 
-### Why there are no PyTorch models
+### Deep models are optional
 
-The PyTorch wheel index and the CUDA PyPI builds were impractical in the build environment, and a CPU-only
-laptop target was a design goal. NeuMF is implemented in NumPy with manual gradients. A transformer
-sequential model (SASRec) and a two-tower retriever are on the roadmap, to be added only if they beat the
-tuned baselines on real data.
+SASRec and the two-tower model need the optional `deep` dependency group (`poetry install --with deep`,
+about 5 GB including the CUDA runtime; they train on CPU). Without it the pipeline, API and tests run
+with the 9 classical channels and the deep tests are skipped. Bundles store weights, not modules, so a
+bundle built with the deep group must be served with it installed.
 
 ## Training data
 
@@ -50,7 +53,9 @@ users. It skews toward older, frequent raters, has only English titles, and cont
 
 See `docs/EVALUATION_REPORT.md`. Key points:
 
-* Hybrid ≈ best single model for warm users. It looks better for cold-start users, but n is small.
+* Hybrid beats every classical model for warm users (+7.7% NDCG@10 over RP3β, paired p < 0.001) and
+  ties the two-tower model. It is numerically best for cold-start users, but n is small.
+* SASRec is weak on synthetic data (no sequence signal); it needs real data to be judged.
 * TasteTwin gives a small, significant forecasting gain from time decay.
 * The fatigue model and hidden interests do not beat their baselines on synthetic data.
 * The journey-policy gains are simulated and depend on whether viewers fatigue.
@@ -59,7 +64,7 @@ See `docs/EVALUATION_REPORT.md`. Key points:
 
 * **Synthetic evidence only.** All metrics are from generated data.
 * **Popularity bias:** collaborative channels concentrate exposure (Gini about 0.95). The exploratory
-  modes do not yet fix long-tail exposure.
+  modes now reach the long tail (26–37% of slots), at a measured accuracy cost.
 * **Explanations** are faithful to model internals but simplified. The SHAP drivers describe the ranker,
   not the candidate generators.
 * **Fatigue is a proxy.** It is a rating drop among viewers who stay active. Inactivity is never used as

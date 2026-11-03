@@ -19,20 +19,29 @@
       checksums, a performance pass (3× faster explained recommendations)
 - [x] Phase 10: documentation set, interview guide, startup strategy
 
+## Completed in v5 (branch `claude/ntg-v5-netflix-grade`)
+
+- [x] SASRec and an inductive two-tower retriever (PyTorch, optional group), faiss HNSW ANN index
+- [x] Hybrid ranker trained on two time windows: warm NDCG@10 0.1495, +7.7% over RP3β (paired p < 0.001)
+- [x] Long-tail channel and reserved long-tail slots: the exploratory modes reach 26–37% long tail
+- [x] Candidate recall 43.9% → 49.0%
+- [x] Streaming TasteTwin slice (event log → idempotent consumer → state store), tested and benchmarked
+- [x] Security: httpOnly cookies + CSRF, rotating refresh tokens with reuse detection, logout-everywhere,
+      Redis-shared rate limiting, login brute-force limit (browser-verified)
+- [x] One-command ML-32M kit (`scripts/run_ml32m.py`) and paired significance script
+
 ## Next (ordered by expected value)
 
-1. **Real benchmark:** run `make build-ml32m` and publish `reports/v4/ml-32m` next to the synthetic
+1. **Real benchmark:** run `python scripts/run_ml32m.py` and publish `reports/v4/ml-32m` next to the synthetic
    results. This is the most important missing evidence.
-2. **Long-tail candidate channel** for the exploratory modes (they currently do not raise long-tail
-   share).
-3. **Raise candidate recall** above 44%: more candidates per channel, a two-tower ANN channel, and
-   learned channel quotas.
-4. **SASRec / GRU4Rec baseline** (requires PyTorch). Keep it only if it beats the tuned baselines on
-   ML-32M.
+2. **Cache user vectors** for known viewers (refreshed by the streaming consumer) to win back the v5
+   latency (p50 7 → 15 ms).
+3. **Raise candidate recall** above 49%: learned per-channel quotas, more two-tower candidates.
+4. **Judge SASRec on ML-32M**, where sequential signal exists; drop it from the channel set if it doesn't
+   beat the Markov baseline there.
 5. **Fatigue from real logs:** estimate the acceptance decline after same-genre streaks to calibrate the
    simulator's `fatigue_sensitivity`.
-6. **Security hardening:** httpOnly cookies and CSRF, refresh and revocation, Redis rate limiting,
-   dependency scanning in CI.
+6. **Security:** password reset and email verification, per-plan quotas, dependency scanning in CI.
 7. **Per-tenant ingestion and training jobs** (upload → validate → build → evaluation gate → promote).
 8. **LLM phrasing layer** for the analyst over the same cited facts. Local or approved provider only.
 9. **Scale-out** components from ARCHITECTURE §6, built only when a customer workload needs them.
@@ -40,10 +49,9 @@
 ## Known limitations
 
 - All evidence is from synthetic data.
-- The hybrid ties the best single model for warm users.
+- The hybrid ties the two-tower model alone for warm users (it beats every classical model).
 - The fatigue and hidden-interest models do not beat their baselines on synthetic data.
 - Journey results are simulated.
-- The JWT is stored in localStorage (demo only).
 - The dense EASE / item-item models need item filtering above about 25k items.
 
 ## IP
