@@ -9,8 +9,13 @@ import pytest
 
 
 @pytest.fixture()
-def sandbox(tmp_path: Path) -> Path:
-    """Per-test filesystem sandbox."""
+def sandbox(tmp_path: Path, monkeypatch) -> Path:
+    """Per-test filesystem sandbox.
+
+    The working directory is switched to ``tmp_path`` so that pipelines using
+    relative paths (data/..., outputs/..., reports/...) never touch the repo.
+    """
+    monkeypatch.chdir(tmp_path)
     return tmp_path
 
 
@@ -75,9 +80,12 @@ def write_small_splits(sandbox: Path, small_interactions_df: pd.DataFrame):
     val_out = val.reset_index(drop=True)
     test_out = test.reset_index(drop=True)
 
-    train_out.to_parquet(base / "train.parquet", index=False)
-    val_out.to_parquet(base / "val.parquet", index=False)
-    test_out.to_parquet(base / "test.parquet", index=False)
+    canonical = sandbox / "data" / "processed" / "splits"
+    canonical.mkdir(parents=True, exist_ok=True)
+    for d in (base, canonical):
+        train_out.to_parquet(d / "train.parquet", index=False)
+        val_out.to_parquet(d / "val.parquet", index=False)
+        test_out.to_parquet(d / "test.parquet", index=False)
 
     return {"dir": base, "train": train_out, "val": val_out, "test": test_out}
 

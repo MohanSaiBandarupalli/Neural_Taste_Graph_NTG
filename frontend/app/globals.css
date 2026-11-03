@@ -1,0 +1,25 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+  --surface-0: #070707; --surface-1: #141414; --surface-2: #1b1b1b; --border: #2a2a2a;
+  --text-primary: #f2f1ee; --text-secondary: #c3c2b7; --text-muted: #8b8a83;
+  --accent: #e50914;
+  /* validated dark categorical palette (ntg dataviz: all checks pass on #141414) */
+  --series-1: #3987e5; --series-2: #d95926; --series-3: #199e70; --series-4: #c98500;
+  --series-5: #d55181; --series-6: #008300; --series-7: #9085e9; --series-8: #e66767;
+  --good: #46d369; --warn: #f5c518; --bad: #ff5a5f;
+}
+html, body { background: var(--surface-0); color: var(--text-primary); }
+body { font-family: var(--font-sans), system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.scroll-row { scrollbar-width: none; } .scroll-row::-webkit-scrollbar { display: none; }
+.card { @apply rounded-xl border border-ink-700 bg-ink-850; }
+.btn { @apply inline-flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-accent disabled:opacity-50; }
+.btn-primary { @apply btn bg-accent text-white hover:bg-accent-glow; }
+.btn-ghost { @apply btn border border-ink-600 bg-ink-800/60 text-neutral-100 hover:bg-ink-700; }
+.input { @apply w-full rounded-md border border-ink-600 bg-ink-900 px-3 py-2 text-sm text-neutral-100 placeholder:text-neutral-500 focus:border-accent focus:outline-none; }
+.label { @apply text-xs font-medium uppercase tracking-wider text-neutral-400; }
+.fade-in { animation: fade .35s ease both; } @keyframes fade { from { opacity: 0; transform: translateY(6px) } to { opacity: 1; transform: none } }
+.poster-hover { transition: transform .25s ease, box-shadow .25s ease; } .poster-hover:hover { transform: scale(1.06); box-shadow: 0 18px 40px rgba(0,0,0,.6); z-index: 5; }

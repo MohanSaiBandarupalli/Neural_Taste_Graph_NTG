@@ -1,0 +1,115 @@
+{
+  "label_definition": "no activity in the 90 days after cutoff, among users active in the 90 days before",
+  "is_proxy": true,
+  "proxy_note": "MovieLens has no subscription/cancellation data; this is an engagement proxy, not churn.",
+  "train_cutoff_iso": "2023-10-25T15:54:25",
+  "test_cutoff_iso": "2024-04-27T05:26:29",
+  "n_users": 1572,
+  "positive_rate": 0.25636132315521626,
+  "gbm_calibrated": {
+    "auc": 0.7975183981558329,
+    "pr_auc": 0.6583461301835631,
+    "brier": 0.1386659987627216,
+    "ece": 0.03590597944658735,
+    "lift_top_decile": 3.205070253354618
+  },
+  "logistic_regression": {
+    "auc": 0.8037409760415362,
+    "pr_auc": 0.6801551995950823,
+    "brier": 0.13345924852140925,
+    "ece": 0.02851542605911109,
+    "lift_top_decile": 3.3541432883943676
+  },
+  "recency_only_baseline": {
+    "auc": 0.789540380423131,
+    "pr_auc": 0.633768312444273,
+    "lift_top_decile": 3.1802247475146594
+  },
+  "by_tenure_segment": {
+    "established (90-365d)": {
+      "n": 723,
+      "positive_rate": 0.30982019363762103,
+      "auc": 0.8207799527626681,
+      "ece": 0.03742467301379334
+    },
+    "loyal (>1y)": {
+      "n": 475,
+      "positive_rate": 0.2463157894736842,
+      "auc": 0.7440314186124242,
+      "ece": 0.038493556651664776
+    },
+    "new (<90d)": {
+      "n": 374,
+      "positive_rate": 0.1657754010695187,
+      "auc": 0.7755893300248139,
+      "ece": 0.04852839428480072
+    }
+  },
+  "calibration_curve": [
+    {
+      "bin": "0.0-0.1",
+      "n": 352,
+      "predicted": 0.06491930700950194,
+      "observed": 0.09375
+    },
+    {
+      "bin": "0.1-0.2",
+      "n": 600,
+      "predicted": 0.1472770573678049,
+      "observed": 0.12833333333333333
+    },
+    {
+      "bin": "0.2-0.3",
+      "n": 268,
+      "predicted": 0.2384541490937166,
+      "observed": 0.25
+    },
+    {
+      "bin": "0.3-0.4",
+      "n": 103,
+      "predicted": 0.33995940630921867,
+      "observed": 0.4174757281553398
+    },
+    {
+      "bin": "0.4-0.5",
+      "n": 67,
+      "predicted": 0.44637501509445726,
+      "observed": 0.5074626865671642
+    },
+    {
+      "bin": "0.5-0.6",
+      "n": 49,
+      "predicted": 0.5497626447700186,
+      "observed": 0.8367346938775511
+    },
+    {
+      "bin": "0.6-0.7",
+      "n": 37,
+      "predicted": 0.6440688569452085,
+      "observed": 0.6216216216216216
+    },
+    {
+      "bin": "0.7-0.8",
+      "n": 36,
+      "predicted": 0.7507248837759869,
+      "observed": 0.8055555555555556
+    },
+    {
+      "bin": "0.8-0.9",
+      "n": 31,
+      "predicted": 0.8586409730014989,
+      "observed": 0.9354838709677419
+    },
+    {
+      "bin": "0.9-1.0",
+      "n": 29,
+      "predicted": 0.9486208972666016,
+      "observed": 0.9310344827586207
+    }
+  ],
+  "train": {
+    "n_users": 1473,
+    "positive_rate": 0.24100475220638154,
+    "cutoff": 1698249265
+  }
+}

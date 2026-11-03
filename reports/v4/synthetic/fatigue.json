@@ -1,0 +1,24 @@
+{
+  "train": {
+    "n_users": 1140,
+    "positive_rate": 0.1543859649122807,
+    "train_auc": 0.6111962466993588
+  },
+  "test": {
+    "n_users": 1180,
+    "positive_rate": 0.16779661016949152,
+    "auc": 0.6265017795058528,
+    "pr_auc": 0.2497186813852637,
+    "baseline_recent_hhi_auc": 0.6338358122981341,
+    "coefficients": {
+      "recent_genre_hhi": 0.28428004213488955,
+      "hhi_delta": -0.0014689522200762163,
+      "franchise_repeat_recent": -0.11012504147754204,
+      "rating_trend": -0.10939018280219487,
+      "novelty_shift": 0.10156694419586279,
+      "gap_trend": -0.2255420024316278,
+      "log_n_events": -0.09281952502125358
+    }
+  },
+  "label": "rating drop > 0.35 stars among users who stay active (>=3 events)"
+}

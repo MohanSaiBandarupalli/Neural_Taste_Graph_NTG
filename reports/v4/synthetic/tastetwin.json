@@ -1,0 +1,412 @@
+{
+  "protocol": "select half-lives/blend on VAL; fit on events < test cutoff; predict genre distribution of test-window events (users with >=5 fit and >=3 holdout events)",
+  "selected_on_val": {
+    "half_life_long": 180.0,
+    "half_life_short": 20.0,
+    "blend": 0.0,
+    "js": 0.19043746298777742
+  },
+  "val_grid": [
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 20.0,
+      "blend": 0.0,
+      "js": 0.19043746298777742
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 20.0,
+      "blend": 0.2,
+      "js": 0.1925020952566076
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 20.0,
+      "blend": 0.4,
+      "js": 0.19780284087008915
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 20.0,
+      "blend": 0.6,
+      "js": 0.20643144014956827
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 20.0,
+      "blend": 0.8,
+      "js": 0.21904759068919014
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 20.0,
+      "blend": 1.0,
+      "js": 0.2376963498558656
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 45.0,
+      "blend": 0.0,
+      "js": 0.19043746298777742
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 45.0,
+      "blend": 0.2,
+      "js": 0.191082917551641
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 45.0,
+      "blend": 0.4,
+      "js": 0.1927768987225872
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 45.0,
+      "blend": 0.6,
+      "js": 0.1955492077366488
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 45.0,
+      "blend": 0.8,
+      "js": 0.1995154550073557
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 45.0,
+      "blend": 1.0,
+      "js": 0.204954052314921
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 90.0,
+      "blend": 0.0,
+      "js": 0.19043746298777742
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 90.0,
+      "blend": 0.2,
+      "js": 0.1905581098559218
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 90.0,
+      "blend": 0.4,
+      "js": 0.19087327196735937
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 90.0,
+      "blend": 0.6,
+      "js": 0.1913871862092602
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 90.0,
+      "blend": 0.8,
+      "js": 0.19210840357605252
+    },
+    {
+      "half_life_long": 180.0,
+      "half_life_short": 90.0,
+      "blend": 1.0,
+      "js": 0.1930519045953002
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 20.0,
+      "blend": 0.0,
+      "js": 0.19136269376193613
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 20.0,
+      "blend": 0.2,
+      "js": 0.19182927471843433
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 20.0,
+      "blend": 0.4,
+      "js": 0.19624622052153076
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 20.0,
+      "blend": 0.6,
+      "js": 0.20458013252727839
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 20.0,
+      "blend": 0.8,
+      "js": 0.21755691521202453
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 20.0,
+      "blend": 1.0,
+      "js": 0.23769786988411648
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 45.0,
+      "blend": 0.0,
+      "js": 0.19136269376193613
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 45.0,
+      "blend": 0.2,
+      "js": 0.19074912964130744
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 45.0,
+      "blend": 0.4,
+      "js": 0.19171544254262385
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 45.0,
+      "blend": 0.6,
+      "js": 0.19424748504133274
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 45.0,
+      "blend": 0.8,
+      "js": 0.19850143037558807
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 45.0,
+      "blend": 1.0,
+      "js": 0.20495602115926942
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 90.0,
+      "blend": 0.0,
+      "js": 0.19136269376193613
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 90.0,
+      "blend": 0.2,
+      "js": 0.19067849126663558
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 90.0,
+      "blend": 0.4,
+      "js": 0.19049466646688631
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 90.0,
+      "blend": 0.6,
+      "js": 0.19080866009829206
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 90.0,
+      "blend": 0.8,
+      "js": 0.19164219314887412
+    },
+    {
+      "half_life_long": 365.0,
+      "half_life_short": 90.0,
+      "blend": 1.0,
+      "js": 0.19305446101638518
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 20.0,
+      "blend": 0.0,
+      "js": 0.19264774266010254
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 20.0,
+      "blend": 0.2,
+      "js": 0.19208355171096897
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 20.0,
+      "blend": 0.4,
+      "js": 0.19588874823489166
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 20.0,
+      "blend": 0.6,
+      "js": 0.20392827307483355
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 20.0,
+      "blend": 0.8,
+      "js": 0.21694520053840077
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 20.0,
+      "blend": 1.0,
+      "js": 0.2376967186363522
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 45.0,
+      "blend": 0.0,
+      "js": 0.19264774266010254
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 45.0,
+      "blend": 0.2,
+      "js": 0.19113794612319093
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 45.0,
+      "blend": 0.4,
+      "js": 0.19154610325434296
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 45.0,
+      "blend": 0.6,
+      "js": 0.19380343747942488
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 45.0,
+      "blend": 0.8,
+      "js": 0.19807578942798465
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 45.0,
+      "blend": 1.0,
+      "js": 0.20495578193317077
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 90.0,
+      "blend": 0.0,
+      "js": 0.19264774266010254
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 90.0,
+      "blend": 0.2,
+      "js": 0.19126568623010692
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 90.0,
+      "blend": 0.4,
+      "js": 0.19061329352796647
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 90.0,
+      "blend": 0.6,
+      "js": 0.1906663109215592
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 90.0,
+      "blend": 0.8,
+      "js": 0.19144868513242574
+    },
+    {
+      "half_life_long": 730.0,
+      "half_life_short": 90.0,
+      "blend": 1.0,
+      "js": 0.19305482019178857
+    }
+  ],
+  "n_users_test": 1101,
+  "n_users_val": 1068,
+  "test": {
+    "global_popularity": {
+      "js_divergence": 0.2497059556701624,
+      "js_ci95": [
+        0.2432312030850763,
+        0.2564891777398621
+      ],
+      "top3_genre_recall": 0.41083863154707845,
+      "top3_ci95": [
+        0.39719951559188615,
+        0.4238570996064184
+      ]
+    },
+    "static_profile_no_decay": {
+      "js_divergence": 0.1908547550342377,
+      "js_ci95": [
+        0.18367258696875607,
+        0.19829400390290494
+      ],
+      "top3_genre_recall": 0.5791704511050559,
+      "top3_ci95": [
+        0.5650847714199213,
+        0.594913714804723
+      ]
+    },
+    "tastetwin_long_only": {
+      "js_divergence": 0.18679204686988693,
+      "js_ci95": [
+        0.1798220557525312,
+        0.19402392832512103
+      ],
+      "top3_genre_recall": 0.5906751438086587,
+      "top3_ci95": [
+        0.5767484105358764,
+        0.6065773539206781
+      ]
+    },
+    "tastetwin_short_only": {
+      "js_divergence": 0.23598060284223255,
+      "js_ci95": [
+        0.22809250145789464,
+        0.24389878030220594
+      ],
+      "top3_genre_recall": 0.5364819860732667,
+      "top3_ci95": [
+        0.5207235846200424,
+        0.5496594005449591
+      ]
+    },
+    "tastetwin": {
+      "js_divergence": 0.18679204686988693,
+      "js_ci95": [
+        0.1798220557525312,
+        0.19402392832512103
+      ],
+      "top3_genre_recall": 0.5906751438086587,
+      "top3_ci95": [
+        0.5767484105358764,
+        0.6065773539206781
+      ]
+    }
+  },
+  "js_reduction_vs_static": 0.004062708164350778,
+  "js_reduction_vs_static_ci95": [
+    0.0026600972880272316,
+    0.0056089894034310524
+  ],
+  "drift_detection_synthetic": {
+    "n_users": 6719,
+    "n_drifting": 2488,
+    "auc_instability": 0.6018856951561777,
+    "auc_max_abs_momentum": 0.6085815079481487,
+    "config": "default TasteTwinConfig (not tuned on this task)",
+    "note": "Ground truth from the synthetic generator; not available for real MovieLens."
+  }
+}
