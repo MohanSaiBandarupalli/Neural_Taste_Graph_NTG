@@ -154,8 +154,7 @@ class HybridRanker:
     min_child_samples: int = 40
     seed: int = 0
 
-    def train(self, cs: ChannelSet, holdout: pd.DataFrame, users: np.ndarray) -> dict:
-        t0 = time.perf_counter()
+    def _window_rows(self, cs: ChannelSet, holdout: pd.DataFrame, users: np.ndarray):
         frames, Xs = [], []
         for s in range(0, len(users), 256):
             df, X = build_candidates(cs, users[s:s + 256], self.n_per_channel)
@@ -165,28 +164,43 @@ class HybridRanker:
         X = np.vstack(Xs)
         rel = set(zip(holdout["u"].to_numpy(), holdout["i"].to_numpy()))
         y = np.fromiter(((a, b) in rel for a, b in zip(df["u"].to_numpy(), df["i"].to_numpy())), dtype=np.int32, count=len(df))
-        # candidate recall: fraction of holdout items (for these users, unseen) that are in the candidate set
         hu = holdout[holdout["u"].isin(users)]
-        seen = cs.X
-        unseen_rel = sum(1 for a, b in zip(hu["u"], hu["i"]) if seen[a, b] == 0)
-        cand_recall = float(y.sum() / max(unseen_rel, 1))
-        # keep only users with at least one positive (lambdarank needs signal)
-        pos_users = df.loc[y == 1, "u"].unique()
-        rng = np.random.default_rng(self.seed)
-        es_users = set(rng.choice(pos_users, max(1, len(pos_users) // 7), replace=False))
-        keep = df["u"].isin(pos_users).to_numpy()
-        is_es = df["u"].isin(es_users).to_numpy()
-        tr = keep & ~is_es
-        va = keep & is_es
+        unseen_rel = sum(1 for a, b in zip(hu["u"], hu["i"]) if cs.X[a, b] == 0)
+        return df, X, y, float(y.sum() / max(unseen_rel, 1))
 
-        uu = df["u"].to_numpy()
+    def train(self, cs: ChannelSet, holdout: pd.DataFrame, users: np.ndarray,
+              extra_windows: tuple = ()) -> dict:
+        """Train on the main window (channels fit before ``holdout``) plus optional earlier windows.
+
+        ``extra_windows`` is a sequence of (ChannelSet, holdout, users) from earlier, non-overlapping
+        time windows. Each (window, user) pair is its own ranking group. Early stopping uses users of the
+        main (latest) window only, since it is the closest in time to how the ranker will be used.
+        """
+        t0 = time.perf_counter()
+        windows = [(cs, holdout, users)] + list(extra_windows)
+        parts = [self._window_rows(c, h, u) for c, h, u in windows]
+        cand_recall = parts[0][3]
+        dfs = []
+        for w, (df, _, _, _) in enumerate(parts):
+            dfs.append(df.assign(window=w, g=df["u"].astype(np.int64) + w * 10_000_000))
+        df = pd.concat(dfs, ignore_index=True)
+        X = np.vstack([p[1] for p in parts])
+        y = np.concatenate([p[2] for p in parts])
+        pos_groups = df.loc[y == 1, "g"].unique()  # lambdarank needs at least one positive per group
+        rng = np.random.default_rng(self.seed)
+        main_pos = pos_groups[pos_groups < 10_000_000]
+        es_groups = set(rng.choice(main_pos, max(1, len(main_pos) // 7), replace=False))
+        keep = df["g"].isin(pos_groups).to_numpy()
+        is_es = df["g"].isin(es_groups).to_numpy()
+        tr, va = keep & ~is_es, keep & is_es
+        gg = df["g"].to_numpy()
 
         def groups(order):
-            return np.unique(uu[order], return_counts=True)[1]  # rows are sorted by u
+            return np.unique(gg[order], return_counts=True)[1]  # rows are sorted by group
 
         # LightGBM requires rows sorted by group
-        order_tr = np.flatnonzero(tr)[np.argsort(df.loc[tr, "u"].to_numpy(), kind="stable")]
-        order_va = np.flatnonzero(va)[np.argsort(df.loc[va, "u"].to_numpy(), kind="stable")]
+        order_tr = np.flatnonzero(tr)[np.argsort(gg[tr], kind="stable")]
+        order_va = np.flatnonzero(va)[np.argsort(gg[va], kind="stable")]
         self.model = lgb.LGBMRanker(
             objective="lambdarank", n_estimators=self.n_estimators, learning_rate=self.learning_rate,
             num_leaves=self.num_leaves, min_child_samples=self.min_child_samples, random_state=self.seed,
@@ -202,8 +216,11 @@ class HybridRanker:
         imp = self.model.booster_.feature_importance("gain")
         self.importance = dict(sorted(zip(self.feature_names, map(float, imp)), key=lambda kv: -kv[1]))
         return {
-            "n_train_users": int(len(set(df.loc[tr, 'u']))),
-            "n_es_users": int(len(es_users)),
+            "n_windows": len(windows),
+            "n_train_groups": int(len(np.unique(gg[tr]))),
+            "n_train_groups_by_window": {int(w): int(len(np.unique(gg[tr & (df["window"].to_numpy() == w)])))
+                                         for w in range(len(windows))},
+            "n_es_users": int(len(es_groups)),
             "n_rows": int(tr.sum()),
             "positive_rate": float(y[tr].mean()),
             "candidate_recall": cand_recall,

@@ -143,8 +143,18 @@ class Pipeline:
         rel_v = holdout_relevance(d, wv.fit, wv.holdout)
         users_v = np.flatnonzero(np.asarray(rel_v.sum(1)).ravel() > 0)
         users_v = users_v[np.bincount(wv.fit["u"], minlength=d.n_users)[users_v] >= 1]
+        # A second, earlier window inside TRAIN roughly doubles the ranker's training groups. It ends
+        # before VAL, so nothing from VAL/TEST informs it.
+        t_a = int(np.quantile(wv.fit["ts"], 0.89))
+        early_fit, early_hold = wv.fit[wv.fit["ts"] < t_a], wv.fit[wv.fit["ts"] >= t_a]
+        cs_early = self._timed("channels_fit_early", ChannelSet(d, early_fit, DEFAULT_CHANNELS, params).fit)
+        rel_e = holdout_relevance(d, early_fit, early_hold)
+        users_e = np.flatnonzero(np.asarray(rel_e.sum(1)).ravel() > 0)
+        users_e = users_e[np.bincount(early_fit["u"], minlength=d.n_users)[users_e] >= 1]
         ranker = HybridRanker(seed=self.seed)
-        ranker_info = self._timed("ranker_train", ranker.train, cs_val, wv.holdout, users_v)
+        ranker_info = self._timed("ranker_train", ranker.train, cs_val, wv.holdout, users_v,
+                                  ((cs_early, early_hold, users_e),))
+        del cs_early
 
         fatigue = FatigueModel()
         fat_train = fatigue.fit(d, wv.fit, wv.holdout, wv.cutoff_ts)
