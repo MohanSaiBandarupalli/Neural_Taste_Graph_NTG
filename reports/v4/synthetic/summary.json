@@ -1,14 +1,17 @@
 {
   "dataset": "synthetic",
-  "version": "synthetic-20261102182943-b2e056e0",
+  "version": "synthetic-20261103015448-0f693178",
   "is_synthetic": true,
   "reports": [
+    "api_load_test.json",
     "benchmark.json",
     "engagement_risk.json",
     "fatigue.json",
     "hidden_interests.json",
     "journey.json",
     "performance.json",
+    "streaming.json",
+    "summary.json",
     "tastetwin.json",
     "tuning.json"
   ]
